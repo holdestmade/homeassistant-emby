@@ -19,6 +19,9 @@ from homeassistant.util import dt as dt_util
 from .const import DOMAIN
 from .coordinator_discovery import EmbyDiscoveryCoordinator
 
+# Timeout for image fetch requests (seconds)
+IMAGE_FETCH_TIMEOUT = 10
+
 if TYPE_CHECKING:
     from typing import Any
 
@@ -150,7 +153,9 @@ class EmbyDiscoveryImageBase(
         # Fetch the image
         session = async_get_clientsession(self.hass)
         try:
-            async with session.get(image_url) as response:
+            async with session.get(
+                image_url, timeout=aiohttp.ClientTimeout(total=IMAGE_FETCH_TIMEOUT)
+            ) as response:
                 if response.status == 200:
                     content_type = response.headers.get("Content-Type", "image/jpeg")
                     self._attr_content_type = content_type

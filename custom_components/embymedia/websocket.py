@@ -16,6 +16,8 @@ _LOGGER = logging.getLogger(__name__)
 # Default reconnection settings
 DEFAULT_RECONNECT_INTERVAL = 5.0  # seconds
 DEFAULT_MAX_RECONNECT_INTERVAL = 300.0  # 5 minutes
+# Timeout for establishing the WebSocket connection (seconds)
+CONNECT_TIMEOUT = 10.0
 # Maximum consecutive JSON decode errors before disconnecting
 MAX_JSON_DECODE_ERRORS = 10
 
@@ -109,14 +111,22 @@ class EmbyWebSocket:
         _LOGGER.debug("Connecting to WebSocket: %s", url.replace(self.api_key, "***"))
 
         try:
-            self._ws = await self._session.ws_connect(
-                url,
-                heartbeat=30,
-            )
+            async with asyncio.timeout(CONNECT_TIMEOUT):
+                self._ws = await self._session.ws_connect(
+                    url,
+                    heartbeat=30,
+                )
             _LOGGER.info("WebSocket connected to Emby server")
 
             if self._connection_callback:
                 self._connection_callback(True)
+
+        except TimeoutError as err:
+            self._ws = None
+            _LOGGER.error("Timed out connecting to Emby WebSocket after %.0fs", CONNECT_TIMEOUT)
+            raise aiohttp.ServerTimeoutError(
+                f"WebSocket connection timed out after {CONNECT_TIMEOUT}s"
+            ) from err
 
         except aiohttp.ClientError:
             self._ws = None

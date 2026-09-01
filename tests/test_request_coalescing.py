@@ -411,3 +411,94 @@ class TestCoalescedRequestNonGetBypass:
             stats = client.get_coalescer_stats()
             assert stats["total_requests"] == 0
             assert stats["coalesced_requests"] == 0
+
+
+class TestCoalescerCancellationSafety:
+    """Cancellation of one caller must never strand other waiters.
+
+    Previously the first caller executed the fetch inline and resolved a
+    shared future. If that caller was cancelled, ``except Exception`` did
+    not catch ``CancelledError``, so the shared future was never resolved
+    and every coalesced waiter hung forever.
+    """
+
+    @pytest.mark.asyncio
+    async def test_caller_cancellation_does_not_strand_waiters(self) -> None:
+        """A coalesced waiter still gets the result if the first caller is cancelled."""
+        from custom_components.embymedia.coalescer import RequestCoalescer
+
+        coalescer = RequestCoalescer()
+        started = asyncio.Event()
+        release = asyncio.Event()
+
+        async def slow_func() -> str:
+            started.set()
+            await release.wait()
+            return "result"
+
+        first = asyncio.create_task(coalescer.coalesce("key", slow_func))
+        await started.wait()
+
+        second = asyncio.create_task(coalescer.coalesce("key", slow_func))
+        await asyncio.sleep(0)  # let the second caller register as a waiter
+
+        # Cancel the first caller while the request is in flight
+        first.cancel()
+        await asyncio.sleep(0)
+
+        release.set()
+
+        # The second caller must still receive the shared result
+        result = await asyncio.wait_for(second, timeout=2)
+        assert result == "result"
+
+    @pytest.mark.asyncio
+    async def test_cancelled_caller_raises_cancelled_error(self) -> None:
+        """The cancelled caller itself observes CancelledError."""
+        from custom_components.embymedia.coalescer import RequestCoalescer
+
+        coalescer = RequestCoalescer()
+        started = asyncio.Event()
+        release = asyncio.Event()
+
+        async def slow_func() -> str:
+            started.set()
+            await release.wait()
+            return "result"
+
+        first = asyncio.create_task(coalescer.coalesce("key", slow_func))
+        await started.wait()
+
+        first.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await first
+
+        release.set()
+        await asyncio.sleep(0)
+
+    @pytest.mark.asyncio
+    async def test_in_flight_cleaned_up_after_cancellation(self) -> None:
+        """The in-flight entry is removed once the shared request finishes."""
+        from custom_components.embymedia.coalescer import RequestCoalescer
+
+        coalescer = RequestCoalescer()
+        started = asyncio.Event()
+        release = asyncio.Event()
+
+        async def slow_func() -> str:
+            started.set()
+            await release.wait()
+            return "result"
+
+        first = asyncio.create_task(coalescer.coalesce("key", slow_func))
+        await started.wait()
+        first.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await first
+
+        release.set()
+        # Allow the shielded task and its done-callback to run
+        await asyncio.sleep(0)
+        await asyncio.sleep(0)
+
+        assert coalescer.get_stats()["in_flight"] == 0

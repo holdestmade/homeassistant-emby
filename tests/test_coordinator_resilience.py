@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from homeassistant.core import HomeAssistant
@@ -351,6 +351,7 @@ class TestAutomaticRecovery:
         # Mock websocket
         mock_ws = MagicMock()
         mock_ws.async_start_reconnect_loop = AsyncMock()
+        mock_ws.connected = False
         coordinator._websocket = mock_ws
         coordinator._max_consecutive_failures = 1
 
@@ -359,7 +360,12 @@ class TestAutomaticRecovery:
             side_effect=EmbyConnectionError("Connection refused")
         )
 
-        await coordinator._async_update_data()
+        # Reconnect now runs as a delayed background task so it never
+        # blocks the coordinator update path
+        with patch("asyncio.sleep", new_callable=AsyncMock):
+            await coordinator._async_update_data()
+            assert coordinator._websocket_reconnect_task is not None
+            await coordinator._websocket_reconnect_task
 
         # Should have attempted to reconnect websocket
         mock_ws.async_start_reconnect_loop.assert_called_once()

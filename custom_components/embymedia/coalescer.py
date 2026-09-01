@@ -18,6 +18,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from collections.abc import Awaitable, Callable
+from functools import partial
 from typing import TypeVar
 
 _LOGGER = logging.getLogger(__name__)
@@ -45,7 +46,7 @@ class RequestCoalescer:
 
     def __init__(self) -> None:
         """Initialize the request coalescer."""
-        self._in_flight: dict[str, asyncio.Future[object]] = {}
+        self._in_flight: dict[str, asyncio.Task[object]] = {}
         self._total_requests: int = 0
         self._coalesced_requests: int = 0
 
@@ -60,6 +61,11 @@ class RequestCoalescer:
         its result instead of making a new request. Otherwise, execute the
         request and share the result with any concurrent callers.
 
+        The shared request runs in its own task, shielded from caller
+        cancellation: cancelling one caller never strands the others.
+        (Previously a cancelled executor left waiters awaiting a future
+        that was never resolved, deadlocking them forever.)
+
         Args:
             key: Unique identifier for this request (e.g., endpoint + params).
             fetch_func: Async function to execute if no request is in flight.
@@ -73,33 +79,41 @@ class RequestCoalescer:
         """
         self._total_requests += 1
 
-        # Check if there's already an in-flight request for this key
-        if key in self._in_flight:
+        task = self._in_flight.get(key)
+        if task is not None:
             self._coalesced_requests += 1
             _LOGGER.debug(
                 "Coalescing request for key '%s' (waiting for in-flight request)",
                 key,
             )
-            # Wait for the existing request to complete
-            return await self._in_flight[key]  # type: ignore[return-value]
-
-        # Create a new future to track this request
-        loop = asyncio.get_running_loop()
-        future: asyncio.Future[object] = loop.create_future()
-        self._in_flight[key] = future
-
-        try:
+        else:
             _LOGGER.debug("Executing request for key '%s'", key)
-            result = await fetch_func()
-            future.set_result(result)
-            return result
-        except Exception as exc:
-            # Propagate error to all waiting callers
-            future.set_exception(exc)
-            raise
-        finally:
-            # Clean up in-flight tracking
+
+            async def _run() -> object:
+                return await fetch_func()
+
+            task = asyncio.get_running_loop().create_task(_run())
+            self._in_flight[key] = task
+            task.add_done_callback(partial(self._on_task_done, key))
+
+        # Shield the shared task so one caller's cancellation does not
+        # cancel the request other callers are still waiting on.
+        result = await asyncio.shield(task)
+        return result  # type: ignore[return-value]
+
+    def _on_task_done(self, key: str, task: asyncio.Task[object]) -> None:
+        """Clean up in-flight tracking when a shared request finishes.
+
+        Args:
+            key: The request key the task was registered under.
+            task: The completed task.
+        """
+        if self._in_flight.get(key) is task:
             del self._in_flight[key]
+        # Retrieve the exception (if any) so asyncio does not log
+        # "Task exception was never retrieved" when no caller remains.
+        if not task.cancelled():
+            task.exception()
 
     def get_stats(self) -> dict[str, int]:
         """Get coalescing statistics.
