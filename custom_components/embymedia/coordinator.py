@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import logging
+import time
 from collections.abc import Mapping
 from datetime import date, datetime, timedelta
 from typing import TYPE_CHECKING, Any
@@ -41,8 +42,11 @@ from .websocket import EmbyWebSocket
 if TYPE_CHECKING:
     from .const import EmbySessionResponse
 
-# Minimum time between WebSocket-triggered refreshes (debouncing)
-WEBSOCKET_REFRESH_DEBOUNCE = timedelta(seconds=2)
+# Minimum time between WebSocket-triggered refreshes (debouncing).
+# Measured on the monotonic clock: a wall clock can step backwards (DST
+# fall-back, an NTP correction) and would then block refreshes until it
+# caught up again.
+WEBSOCKET_REFRESH_DEBOUNCE_SECONDS = 2.0
 
 # Emby uses ticks (100 nanoseconds) for time tracking
 EMBY_TICKS_PER_SECOND = 10_000_000
@@ -135,8 +139,8 @@ class EmbyDataUpdateCoordinator(DataUpdateCoordinator[dict[str, EmbySession]]):
         # Resilience tracking
         self._consecutive_failures: int = 0
         self._max_consecutive_failures: int = 5
-        # Debouncing for WebSocket-triggered refreshes
-        self._last_websocket_refresh: datetime | None = None
+        # Debouncing for WebSocket-triggered refreshes (monotonic seconds)
+        self._last_websocket_refresh: float | None = None
         # Playback tracking (Phase 18) - per user
         # Key is "{user_id}:{session_id}" to track per-user sessions
         self._playback_sessions: dict[str, dict[str, int | str]] = {}
@@ -282,14 +286,17 @@ class EmbyDataUpdateCoordinator(DataUpdateCoordinator[dict[str, EmbySession]]):
             self.update_interval,
         )
         # Cancel health check task
+        self._cancel_health_check()
+
+    def _cancel_health_check(self) -> None:
+        """Cancel the periodic health check task, if one is running."""
         if self._health_check_task is not None:
             self._health_check_task.cancel()
             self._health_check_task = None
 
     def _schedule_health_check(self) -> None:
         """Schedule periodic health checks while polling is disabled."""
-        if self._health_check_task is not None:
-            self._health_check_task.cancel()
+        self._cancel_health_check()
 
         async def _health_check_loop() -> None:
             """Run health checks periodically."""
@@ -780,6 +787,25 @@ class EmbyDataUpdateCoordinator(DataUpdateCoordinator[dict[str, EmbySession]]):
             name=f"{DOMAIN}_{self.server_id}_websocket_receive",
         )
 
+    async def async_shutdown(self) -> None:
+        """Shut down the coordinator and all of its background tasks.
+
+        Registered as the config entry's unload callback. The health check
+        loop runs for as long as polling is disabled, so without this it
+        would outlive the entry: reloading the integration would leave one
+        loop per reload still polling the server through a stale client.
+        """
+        # Stops the loop's own condition as well as cancelling the task
+        self._polling_disabled = False
+        task = self._health_check_task
+        self._cancel_health_check()
+        if task is not None:
+            with contextlib.suppress(asyncio.CancelledError):
+                await task
+
+        await self.async_shutdown_websocket()
+        await super().async_shutdown()
+
     async def async_shutdown_websocket(self) -> None:
         """Shut down WebSocket connection."""
         # Mark disabled first so the receive loop's cleanup does not
@@ -857,10 +883,10 @@ class EmbyDataUpdateCoordinator(DataUpdateCoordinator[dict[str, EmbySession]]):
 
     def _trigger_debounced_refresh(self) -> None:
         """Trigger a refresh with debouncing to prevent excessive API calls."""
-        now = datetime.now()
+        now = time.monotonic()
         if (
             self._last_websocket_refresh is None
-            or now - self._last_websocket_refresh > WEBSOCKET_REFRESH_DEBOUNCE
+            or now - self._last_websocket_refresh > WEBSOCKET_REFRESH_DEBOUNCE_SECONDS
         ):
             self._last_websocket_refresh = now
             self.hass.async_create_task(self.async_refresh())
@@ -885,9 +911,7 @@ class EmbyDataUpdateCoordinator(DataUpdateCoordinator[dict[str, EmbySession]]):
             self._polling_disabled = False
             self.update_interval = timedelta(seconds=self._configured_scan_interval)  # type: ignore[misc]
             # Cancel health check task if running
-            if self._health_check_task is not None:
-                self._health_check_task.cancel()
-                self._health_check_task = None
+            self._cancel_health_check()
 
         # Notify library coordinator of WebSocket status change (#289)
         # When WebSocket is active, LibraryChanged events trigger immediate refreshes,

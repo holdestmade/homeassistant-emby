@@ -303,3 +303,59 @@ class TestCacheKeyHashing:
 
         # 16-byte digest = 32 hex characters
         assert len(key) == 32
+
+
+class TestCacheEvictionOnOverwrite:
+    """Overwriting a cached key must not evict an unrelated entry.
+
+    `set()` used to evict whenever the cache was at capacity, including when
+    the key was already present - so refreshing one hot entry silently
+    dropped the oldest unrelated one and the cache never stayed full.
+    """
+
+    def test_overwrite_at_capacity_keeps_other_entries(self) -> None:
+        """Re-setting an existing key evicts nothing."""
+        from custom_components.embymedia.cache import BrowseCache
+
+        cache = BrowseCache(ttl_seconds=300.0, max_entries=3)
+        cache.set("a", 1)
+        cache.set("b", 2)
+        cache.set("c", 3)
+
+        # Overwrite an existing key while at capacity
+        cache.set("b", 22)
+
+        assert cache.get("a") == 1
+        assert cache.get("b") == 22
+        assert cache.get("c") == 3
+        assert cache.get_stats()["entries"] == 3
+
+    def test_new_key_at_capacity_evicts_least_recently_used(self) -> None:
+        """Adding a genuinely new key still evicts the oldest entry."""
+        from custom_components.embymedia.cache import BrowseCache
+
+        cache = BrowseCache(ttl_seconds=300.0, max_entries=3)
+        cache.set("a", 1)
+        cache.set("b", 2)
+        cache.set("c", 3)
+
+        cache.set("d", 4)
+
+        assert cache.get("a") is None
+        assert cache.get("d") == 4
+        assert cache.get_stats()["entries"] == 3
+
+    def test_overwrite_marks_entry_most_recently_used(self) -> None:
+        """An overwritten key is not the next eviction candidate."""
+        from custom_components.embymedia.cache import BrowseCache
+
+        cache = BrowseCache(ttl_seconds=300.0, max_entries=2)
+        cache.set("a", 1)
+        cache.set("b", 2)
+
+        cache.set("a", 11)  # 'a' becomes most recently used
+        cache.set("c", 3)  # evicts 'b'
+
+        assert cache.get("a") == 11
+        assert cache.get("b") is None
+        assert cache.get("c") == 3

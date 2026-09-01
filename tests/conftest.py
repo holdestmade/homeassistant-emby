@@ -240,6 +240,7 @@ def create_mock_session_coordinator(
     coordinator.async_config_entry_first_refresh = AsyncMock()
     coordinator.async_setup_websocket = AsyncMock()
     coordinator.async_shutdown_websocket = AsyncMock()
+    coordinator.async_shutdown = AsyncMock()
     coordinator.data = {}
     coordinator.last_update_success = True
     return coordinator

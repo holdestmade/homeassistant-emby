@@ -347,7 +347,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: EmbyConfigEntry) -> bool
 
     # Register cleanup callbacks
     entry.async_on_unload(entry.add_update_listener(async_options_updated))
-    entry.async_on_unload(session_coordinator.async_shutdown_websocket)
+    # Tears down the WebSocket and the health check loop together
+    entry.async_on_unload(session_coordinator.async_shutdown)
 
     _LOGGER.info(
         "Connected to Emby server: %s (version %s)",

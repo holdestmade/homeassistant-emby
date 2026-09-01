@@ -206,3 +206,67 @@ class TestWebSocketReceiveLoopIsBackgroundTask:
         mock_bg.assert_called_once()
 
         await coordinator.async_shutdown_websocket()
+
+
+class TestBackgroundTasksStopOnUnload:
+    """Background loops must not outlive the config entry.
+
+    The health check loop runs for as long as polling is disabled, and was
+    only ever cancelled when the WebSocket became unstable. Nothing stopped
+    it when the entry was unloaded, so every reload left another loop
+    running against a stale client.
+    """
+
+    @pytest.mark.asyncio
+    async def test_shutdown_cancels_health_check_loop(
+        self,
+        hass: HomeAssistant,
+        mock_client: MagicMock,
+        mock_config_entry: MagicMock,
+    ) -> None:
+        """`async_shutdown` cancels the health check loop."""
+        coordinator = _make_coordinator(hass, mock_client, mock_config_entry)
+
+        coordinator._polling_disabled = True
+        coordinator._schedule_health_check()
+
+        task = coordinator._health_check_task
+        assert task is not None
+        assert not task.done()
+
+        await coordinator.async_shutdown()
+
+        assert task.cancelled() or task.done()
+        assert coordinator._health_check_task is None
+
+    @pytest.mark.asyncio
+    async def test_shutdown_also_stops_the_websocket(
+        self,
+        hass: HomeAssistant,
+        mock_client: MagicMock,
+        mock_config_entry: MagicMock,
+    ) -> None:
+        """`async_shutdown` tears the WebSocket down too."""
+        coordinator = _make_coordinator(hass, mock_client, mock_config_entry)
+
+        forever = asyncio.Event()
+        mock_websocket = MagicMock()
+        mock_websocket.async_connect = AsyncMock()
+        mock_websocket.async_subscribe_sessions = AsyncMock()
+        mock_websocket.async_run_receive_loop = AsyncMock(side_effect=forever.wait)
+        mock_websocket.async_stop_reconnect_loop = AsyncMock()
+
+        with patch(
+            "custom_components.embymedia.coordinator.EmbyWebSocket",
+            return_value=mock_websocket,
+        ):
+            await coordinator.async_setup_websocket(MagicMock())
+
+        receive_task = coordinator._websocket_receive_task
+        assert receive_task is not None
+
+        await coordinator.async_shutdown()
+
+        mock_websocket.async_stop_reconnect_loop.assert_awaited_once()
+        assert coordinator._websocket_receive_task is None
+        assert coordinator.websocket_enabled is False
