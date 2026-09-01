@@ -2119,3 +2119,68 @@ class TestDiscoveryCacheInvalidation:
 
         mock_coordinator_1.on_library_changed.assert_called_once()
         mock_coordinator_2.on_library_changed.assert_called_once()
+
+
+class TestWebSocketRefreshDebounceClock:
+    """The refresh debounce must use a monotonic clock.
+
+    It previously compared `datetime.now()` values. A wall clock can step
+    backwards - a DST fall-back or an NTP correction - which makes the
+    elapsed time negative and blocks every WebSocket-driven refresh until
+    the clock catches up, potentially for an hour.
+    """
+
+    @pytest.mark.asyncio
+    async def test_refresh_still_fires_after_wall_clock_steps_back(
+        self,
+        hass: HomeAssistant,
+        mock_emby_client: MagicMock,
+    ) -> None:
+        """A backwards wall-clock jump must not block refreshes."""
+        from custom_components.embymedia.coordinator import EmbyDataUpdateCoordinator
+
+        coordinator = EmbyDataUpdateCoordinator(
+            hass=hass,
+            client=mock_emby_client,
+            server_id="server-123",
+            server_name="Test Server",
+            config_entry=mock_config_entry,
+        )
+        coordinator.async_refresh = AsyncMock()  # type: ignore[method-assign]
+
+        # Simulate a wall clock an hour ahead of where it will be next
+        with patch("time.monotonic", side_effect=[1000.0, 1010.0]):
+            coordinator._trigger_debounced_refresh()
+            coordinator._trigger_debounced_refresh()
+
+        await hass.async_block_till_done()
+
+        # Both fired: 10 monotonic seconds apart, regardless of wall clock
+        assert coordinator.async_refresh.call_count == 2
+
+    @pytest.mark.asyncio
+    async def test_rapid_refreshes_are_debounced(
+        self,
+        hass: HomeAssistant,
+        mock_emby_client: MagicMock,
+    ) -> None:
+        """Calls inside the debounce window collapse into one refresh."""
+        from custom_components.embymedia.coordinator import EmbyDataUpdateCoordinator
+
+        coordinator = EmbyDataUpdateCoordinator(
+            hass=hass,
+            client=mock_emby_client,
+            server_id="server-123",
+            server_name="Test Server",
+            config_entry=mock_config_entry,
+        )
+        coordinator.async_refresh = AsyncMock()  # type: ignore[method-assign]
+
+        with patch("time.monotonic", side_effect=[1000.0, 1000.5, 1001.0]):
+            coordinator._trigger_debounced_refresh()
+            coordinator._trigger_debounced_refresh()
+            coordinator._trigger_debounced_refresh()
+
+        await hass.async_block_till_done()
+
+        assert coordinator.async_refresh.call_count == 1

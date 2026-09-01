@@ -77,13 +77,17 @@ class BrowseCache:
             key: The cache key.
             value: The value to cache.
         """
-        # Remove oldest entries if at max capacity
-        while len(self._cache) >= self._max_entries:
-            self._cache.popitem(last=False)
+        # Overwriting an existing key does not grow the cache, so only evict
+        # when adding a genuinely new one - otherwise refreshing a cached
+        # entry needlessly drops an unrelated one.
+        if key in self._cache:
+            del self._cache[key]
+        else:
+            while len(self._cache) >= self._max_entries:
+                self._cache.popitem(last=False)
 
+        # Assignment appends to the end, marking it most recently used
         self._cache[key] = (time.time(), value)
-        # Move to end (most recently added)
-        self._cache.move_to_end(key)
 
     def delete(self, key: str) -> None:
         """Delete a specific cache entry.

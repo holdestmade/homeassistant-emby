@@ -465,7 +465,8 @@ class TestBrowseMediaThumbnails:
         result = await player.async_browse_media()
 
         assert result.children is not None
-        assert result.children[0].thumbnail == "http://emby:8096/image.jpg"
+        assert result.children[0].thumbnail is not None
+        assert result.children[0].thumbnail.startswith("/api/embymedia/image/server-123/")
 
     @pytest.mark.asyncio
     async def test_item_thumbnail_generation(
@@ -498,7 +499,8 @@ class TestBrowseMediaThumbnails:
         )
 
         assert result.children is not None
-        assert result.children[0].thumbnail == "http://emby:8096/image.jpg"
+        assert result.children[0].thumbnail is not None
+        assert result.children[0].thumbnail.startswith("/api/embymedia/image/server-123/")
 
     @pytest.mark.asyncio
     async def test_season_thumbnail_generation(
@@ -528,7 +530,8 @@ class TestBrowseMediaThumbnails:
         )
 
         assert result.children is not None
-        assert result.children[0].thumbnail == "http://emby:8096/image.jpg"
+        assert result.children[0].thumbnail is not None
+        assert result.children[0].thumbnail.startswith("/api/embymedia/image/server-123/")
 
     @pytest.mark.asyncio
     async def test_folder_item_browse(
@@ -1230,10 +1233,13 @@ class TestItemToBrowseMedia:
             }
         )
 
-        assert result.thumbnail == "http://emby.local/album-image.jpg"
-        mock_coordinator_for_browse.client.get_image_url.assert_called_once_with(
-            "album-123", image_type="Primary", tag="tag123"
+        # Thumbnails go through the image proxy, which keeps the API key
+        # server-side rather than embedding it in a URL sent to the browser
+        assert result.thumbnail is not None
+        assert result.thumbnail.startswith(
+            "/api/embymedia/image/server-123/album-123/Primary?tag=tag123"
         )
+        mock_coordinator_for_browse.client.get_image_url.assert_not_called()
 
     def test_track_to_browse_media_with_thumbnail(
         self,
@@ -1257,10 +1263,11 @@ class TestItemToBrowseMedia:
             }
         )
 
-        assert result.thumbnail == "http://emby.local/track-image.jpg"
-        mock_coordinator_for_browse.client.get_image_url.assert_called_once_with(
-            "track-123", image_type="Primary", tag="tag456"
+        assert result.thumbnail is not None
+        assert result.thumbnail.startswith(
+            "/api/embymedia/image/server-123/track-123/Primary?tag=tag456"
         )
+        mock_coordinator_for_browse.client.get_image_url.assert_not_called()
 
 
 # =============================================================================

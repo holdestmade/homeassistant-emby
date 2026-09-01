@@ -680,13 +680,17 @@ class TestWebSocketSetup:
             session_coordinator.async_setup_websocket.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_unload_stops_websocket(
+    async def test_unload_shuts_down_coordinator(
         self,
         hass: HomeAssistant,
         mock_config_entry: MockConfigEntry,
         mock_server_info: dict[str, Any],
     ) -> None:
-        """Test WebSocket is stopped during unload."""
+        """Test all coordinator background tasks are stopped during unload.
+
+        Unload must tear down the health check loop as well as the
+        WebSocket, so `async_shutdown` is the registered callback.
+        """
         mock_config_entry.add_to_hass(hass)
 
         session_coordinator = create_mock_session_coordinator()
@@ -718,8 +722,8 @@ class TestWebSocketSetup:
 
             await hass.config_entries.async_unload(mock_config_entry.entry_id)
 
-            # WebSocket shutdown should be called via on_unload callback
-            session_coordinator.async_shutdown_websocket.assert_called_once()
+            # Full coordinator shutdown runs via the on_unload callback
+            session_coordinator.async_shutdown.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_setup_succeeds_if_websocket_fails(

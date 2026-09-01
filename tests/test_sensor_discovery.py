@@ -33,11 +33,9 @@ def mock_client() -> MagicMock:
     """Create a mock Emby client."""
     client = MagicMock()
     client.get_image_url = MagicMock(
-        side_effect=lambda item_id,
-        image_type="Primary",
-        max_width=None,
-        max_height=None,
-        tag=None: f"https://emby.local/Items/{item_id}/Images/{image_type}"
+        side_effect=lambda item_id, image_type="Primary", max_width=None, max_height=None, tag=None: (
+            f"https://emby.local/Items/{item_id}/Images/{image_type}"
+        )
     )
     return client
 
@@ -46,6 +44,7 @@ def mock_client() -> MagicMock:
 def mock_coordinator(mock_client: MagicMock) -> MagicMock:
     """Create a mock discovery coordinator."""
     coordinator = MagicMock(spec=EmbyDiscoveryCoordinator)
+    coordinator.hass = MagicMock()
     coordinator.server_id = "server123"
     coordinator.server_name = "Emby Server"
     coordinator.user_id = "user456"
@@ -65,6 +64,7 @@ def mock_coordinator(mock_client: MagicMock) -> MagicMock:
 def mock_coordinator_with_data(mock_client: MagicMock) -> MagicMock:
     """Create a mock coordinator with sample data."""
     coordinator = MagicMock(spec=EmbyDiscoveryCoordinator)
+    coordinator.hass = MagicMock()
     coordinator.server_id = "server123"
     coordinator.server_name = "Emby Server"
     coordinator.user_id = "user456"
@@ -209,10 +209,12 @@ class TestEmbyNextUpSensor:
         assert items[0]["episode_number"] == 5
         assert items[0]["season_number"] == 1
         # Image URLs - series image preferred for episodes
-        assert items[0]["image_url"] == "https://emby.local/Items/series1/Images/Primary"
-        assert items[0]["backdrop_url"] == "https://emby.local/Items/episode1/Images/Backdrop"
+        assert items[0]["image_url"].startswith("/api/embymedia/image/server123/series1/Primary")
+        assert items[0]["backdrop_url"].startswith(
+            "/api/embymedia/image/server123/episode1/Backdrop"
+        )
         # Second item has series_id so uses series image (no primary tag doesn't prevent series lookup)
-        assert items[1]["image_url"] == "https://emby.local/Items/series2/Images/Primary"
+        assert items[1]["image_url"].startswith("/api/embymedia/image/server123/series2/Primary")
 
     def test_available_when_coordinator_success(
         self,
@@ -287,8 +289,8 @@ class TestEmbyContinueWatchingSensor:
         assert items[0]["type"] == "Movie"
         assert items[0]["progress_percent"] == 50.0
         # Image URLs for movies
-        assert items[0]["image_url"] == "https://emby.local/Items/movie1/Images/Primary"
-        assert items[0]["backdrop_url"] == "https://emby.local/Items/movie1/Images/Backdrop"
+        assert items[0]["image_url"].startswith("/api/embymedia/image/server123/movie1/Primary")
+        assert items[0]["backdrop_url"].startswith("/api/embymedia/image/server123/movie1/Backdrop")
 
     def test_native_value_no_data(
         self,
@@ -352,10 +354,10 @@ class TestEmbyRecentlyAddedSensor:
         assert items[0]["id"] == "new1"
         assert items[0]["type"] == "Movie"
         # Image URLs
-        assert items[0]["image_url"] == "https://emby.local/Items/new1/Images/Primary"
-        assert items[0]["backdrop_url"] == "https://emby.local/Items/new1/Images/Backdrop"
+        assert items[0]["image_url"].startswith("/api/embymedia/image/server123/new1/Primary")
+        assert items[0]["backdrop_url"].startswith("/api/embymedia/image/server123/new1/Backdrop")
         # Episode falls back to item image when no series tag
-        assert items[1]["image_url"] == "https://emby.local/Items/newseries1/Images/Primary"
+        assert items[1]["image_url"].startswith("/api/embymedia/image/server123/newseries1/Primary")
 
     def test_native_value_no_data(
         self,
@@ -420,8 +422,10 @@ class TestEmbySuggestionsSensor:
         assert items[0]["name"] == "Suggested Movie"
         assert items[0]["rating"] == 8.5
         # Image URLs
-        assert items[0]["image_url"] == "https://emby.local/Items/suggest1/Images/Primary"
-        assert items[0]["backdrop_url"] == "https://emby.local/Items/suggest1/Images/Backdrop"
+        assert items[0]["image_url"].startswith("/api/embymedia/image/server123/suggest1/Primary")
+        assert items[0]["backdrop_url"].startswith(
+            "/api/embymedia/image/server123/suggest1/Backdrop"
+        )
 
     def test_native_value_no_data(
         self,

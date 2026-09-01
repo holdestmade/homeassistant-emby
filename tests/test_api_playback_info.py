@@ -280,7 +280,7 @@ class TestRequestPostJson:
 
         with patch.object(emby_client, "_get_session", new_callable=AsyncMock) as mock_get_session:
             mock_session = MagicMock()
-            mock_session.post = MagicMock(
+            mock_session.request = MagicMock(
                 return_value=MagicMock(__aenter__=AsyncMock(return_value=mock_response))
             )
             mock_get_session.return_value = mock_session
@@ -298,7 +298,7 @@ class TestRequestPostJson:
 
         with patch.object(emby_client, "_get_session", new_callable=AsyncMock) as mock_get_session:
             mock_session = MagicMock()
-            mock_session.post = MagicMock(
+            mock_session.request = MagicMock(
                 return_value=MagicMock(__aenter__=AsyncMock(return_value=mock_response))
             )
             mock_get_session.return_value = mock_session
@@ -315,7 +315,7 @@ class TestRequestPostJson:
 
         with patch.object(emby_client, "_get_session", new_callable=AsyncMock) as mock_get_session:
             mock_session = MagicMock()
-            mock_session.post = MagicMock(
+            mock_session.request = MagicMock(
                 return_value=MagicMock(__aenter__=AsyncMock(return_value=mock_response))
             )
             mock_get_session.return_value = mock_session
@@ -334,7 +334,7 @@ class TestRequestPostJson:
 
         with patch.object(emby_client, "_get_session", new_callable=AsyncMock) as mock_get_session:
             mock_session = MagicMock()
-            mock_session.post = MagicMock(
+            mock_session.request = MagicMock(
                 return_value=MagicMock(__aenter__=AsyncMock(return_value=mock_response))
             )
             mock_get_session.return_value = mock_session
@@ -353,7 +353,7 @@ class TestRequestPostJson:
             mock_session = MagicMock()
             # Create a proper SSL error
             ssl_error = SSLCertVerificationError(1, "certificate verify failed")
-            mock_session.post = MagicMock(
+            mock_session.request = MagicMock(
                 side_effect=aiohttp.ClientSSLError(MagicMock(), ssl_error)
             )
             mock_get_session.return_value = mock_session
@@ -368,7 +368,7 @@ class TestRequestPostJson:
 
         with patch.object(emby_client, "_get_session", new_callable=AsyncMock) as mock_get_session:
             mock_session = MagicMock()
-            mock_session.post = MagicMock(side_effect=TimeoutError())
+            mock_session.request = MagicMock(side_effect=TimeoutError())
             mock_get_session.return_value = mock_session
 
             with pytest.raises(EmbyTimeoutError):
@@ -379,7 +379,7 @@ class TestRequestPostJson:
         """Test POST with connection error."""
         with patch.object(emby_client, "_get_session", new_callable=AsyncMock) as mock_get_session:
             mock_session = MagicMock()
-            mock_session.post = MagicMock(
+            mock_session.request = MagicMock(
                 side_effect=aiohttp.ClientConnectorError(MagicMock(), OSError("Connection refused"))
             )
             mock_get_session.return_value = mock_session
@@ -392,7 +392,7 @@ class TestRequestPostJson:
         """Test POST with generic client error."""
         with patch.object(emby_client, "_get_session", new_callable=AsyncMock) as mock_get_session:
             mock_session = MagicMock()
-            mock_session.post = MagicMock(side_effect=aiohttp.ClientError("Generic error"))
+            mock_session.request = MagicMock(side_effect=aiohttp.ClientError("Generic error"))
             mock_get_session.return_value = mock_session
 
             with pytest.raises(EmbyConnectionError):

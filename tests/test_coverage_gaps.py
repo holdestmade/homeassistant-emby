@@ -67,7 +67,7 @@ class TestCoordinatorWebSocketErrors:
                 mock_ws.async_subscribe_sessions = AsyncMock(
                     side_effect=RuntimeError("Subscription failed")
                 )
-                mock_ws.async_close = AsyncMock()
+                mock_ws.async_stop_reconnect_loop = AsyncMock()
                 mock_ws_class.return_value = mock_ws
 
                 await hass.config_entries.async_setup(mock_config_entry.entry_id)
@@ -106,7 +106,7 @@ class TestCoordinatorWebSocketErrors:
                 mock_ws = MagicMock()
                 mock_ws.async_connect = AsyncMock()
                 mock_ws.async_subscribe_sessions = AsyncMock()
-                mock_ws.async_close = AsyncMock()
+                mock_ws.async_stop_reconnect_loop = AsyncMock()
 
                 # Make async_run_receive_loop raise ClientError after being called
                 async def mock_receive_loop():
@@ -152,7 +152,7 @@ class TestCoordinatorWebSocketErrors:
                 mock_ws.async_connect = AsyncMock(
                     side_effect=aiohttp.ClientError("Connection refused")
                 )
-                mock_ws.async_close = AsyncMock()
+                mock_ws.async_stop_reconnect_loop = AsyncMock()
                 mock_ws_class.return_value = mock_ws
 
                 await hass.config_entries.async_setup(mock_config_entry.entry_id)

@@ -1266,10 +1266,7 @@ class TestOptionsFlowPrefixToggles:
     ) -> None:
         """Test prefix toggle options are available in options flow."""
         from custom_components.embymedia.const import (
-            CONF_PREFIX_BUTTON,
-            CONF_PREFIX_MEDIA_PLAYER,
-            CONF_PREFIX_NOTIFY,
-            CONF_PREFIX_REMOTE,
+            CONF_PREFIX_DEVICE_NAMES,
         )
 
         mock_config_entry.add_to_hass(hass)
@@ -1284,18 +1281,12 @@ class TestOptionsFlowPrefixToggles:
             result["flow_id"],
             {
                 "scan_interval": 15,
-                CONF_PREFIX_MEDIA_PLAYER: True,
-                CONF_PREFIX_NOTIFY: True,
-                CONF_PREFIX_REMOTE: True,
-                CONF_PREFIX_BUTTON: True,
+                CONF_PREFIX_DEVICE_NAMES: True,
             },
         )
 
         assert result["type"] is FlowResultType.CREATE_ENTRY
-        assert result["data"][CONF_PREFIX_MEDIA_PLAYER] is True
-        assert result["data"][CONF_PREFIX_NOTIFY] is True
-        assert result["data"][CONF_PREFIX_REMOTE] is True
-        assert result["data"][CONF_PREFIX_BUTTON] is True
+        assert result["data"][CONF_PREFIX_DEVICE_NAMES] is True
 
     @pytest.mark.asyncio
     async def test_options_flow_prefix_toggles_can_be_disabled(
@@ -1305,10 +1296,7 @@ class TestOptionsFlowPrefixToggles:
     ) -> None:
         """Test prefix toggles can be disabled."""
         from custom_components.embymedia.const import (
-            CONF_PREFIX_BUTTON,
-            CONF_PREFIX_MEDIA_PLAYER,
-            CONF_PREFIX_NOTIFY,
-            CONF_PREFIX_REMOTE,
+            CONF_PREFIX_DEVICE_NAMES,
         )
 
         mock_config_entry.add_to_hass(hass)
@@ -1320,18 +1308,12 @@ class TestOptionsFlowPrefixToggles:
             result["flow_id"],
             {
                 "scan_interval": 15,
-                CONF_PREFIX_MEDIA_PLAYER: False,
-                CONF_PREFIX_NOTIFY: False,
-                CONF_PREFIX_REMOTE: False,
-                CONF_PREFIX_BUTTON: False,
+                CONF_PREFIX_DEVICE_NAMES: False,
             },
         )
 
         assert result["type"] is FlowResultType.CREATE_ENTRY
-        assert result["data"][CONF_PREFIX_MEDIA_PLAYER] is False
-        assert result["data"][CONF_PREFIX_NOTIFY] is False
-        assert result["data"][CONF_PREFIX_REMOTE] is False
-        assert result["data"][CONF_PREFIX_BUTTON] is False
+        assert result["data"][CONF_PREFIX_DEVICE_NAMES] is False
 
     @pytest.mark.asyncio
     async def test_options_flow_prefix_toggles_defaults_to_true(
@@ -1341,10 +1323,7 @@ class TestOptionsFlowPrefixToggles:
     ) -> None:
         """Test prefix toggles default to True (enabled)."""
         from custom_components.embymedia.const import (
-            CONF_PREFIX_BUTTON,
-            CONF_PREFIX_MEDIA_PLAYER,
-            CONF_PREFIX_NOTIFY,
-            CONF_PREFIX_REMOTE,
+            CONF_PREFIX_DEVICE_NAMES,
         )
 
         mock_config_entry.add_to_hass(hass)
@@ -1359,10 +1338,7 @@ class TestOptionsFlowPrefixToggles:
 
         assert result["type"] is FlowResultType.CREATE_ENTRY
         # When not explicitly set, they should use defaults (True)
-        assert result["data"].get(CONF_PREFIX_MEDIA_PLAYER, True) is True
-        assert result["data"].get(CONF_PREFIX_NOTIFY, True) is True
-        assert result["data"].get(CONF_PREFIX_REMOTE, True) is True
-        assert result["data"].get(CONF_PREFIX_BUTTON, True) is True
+        assert result["data"].get(CONF_PREFIX_DEVICE_NAMES, True) is True
 
     @pytest.mark.asyncio
     async def test_options_flow_preserves_existing_prefix_settings(
@@ -1371,10 +1347,7 @@ class TestOptionsFlowPrefixToggles:
     ) -> None:
         """Test existing prefix settings are preserved in form."""
         from custom_components.embymedia.const import (
-            CONF_PREFIX_BUTTON,
-            CONF_PREFIX_MEDIA_PLAYER,
-            CONF_PREFIX_NOTIFY,
-            CONF_PREFIX_REMOTE,
+            CONF_PREFIX_DEVICE_NAMES,
         )
 
         # Create entry with existing prefix options (some disabled)
@@ -1387,10 +1360,7 @@ class TestOptionsFlowPrefixToggles:
             },
             options={
                 "scan_interval": 20,
-                CONF_PREFIX_MEDIA_PLAYER: True,  # Enabled
-                CONF_PREFIX_NOTIFY: False,  # Disabled
-                CONF_PREFIX_REMOTE: True,  # Enabled
-                CONF_PREFIX_BUTTON: False,  # Disabled
+                CONF_PREFIX_DEVICE_NAMES: False,
             },
             unique_id="test-server-id-12345",
         )
@@ -1404,19 +1374,13 @@ class TestOptionsFlowPrefixToggles:
             result["flow_id"],
             {
                 "scan_interval": 25,
-                CONF_PREFIX_MEDIA_PLAYER: True,
-                CONF_PREFIX_NOTIFY: False,
-                CONF_PREFIX_REMOTE: True,
-                CONF_PREFIX_BUTTON: False,
+                CONF_PREFIX_DEVICE_NAMES: False,
             },
         )
 
         assert result["type"] is FlowResultType.CREATE_ENTRY
         assert result["data"]["scan_interval"] == 25
-        assert result["data"][CONF_PREFIX_MEDIA_PLAYER] is True
-        assert result["data"][CONF_PREFIX_NOTIFY] is False
-        assert result["data"][CONF_PREFIX_REMOTE] is True
-        assert result["data"][CONF_PREFIX_BUTTON] is False
+        assert result["data"][CONF_PREFIX_DEVICE_NAMES] is False
 
 
 class TestOptionsFlowDiscoverySensors:
@@ -1721,10 +1685,7 @@ class TestEntityOptionsStep:
     ) -> None:
         """Test custom entity options are saved to config entry."""
         from custom_components.embymedia.const import (
-            CONF_PREFIX_BUTTON,
-            CONF_PREFIX_MEDIA_PLAYER,
-            CONF_PREFIX_NOTIFY,
-            CONF_PREFIX_REMOTE,
+            CONF_PREFIX_DEVICE_NAMES,
         )
 
         result = await hass.config_entries.flow.async_init(
@@ -1752,19 +1713,13 @@ class TestEntityOptionsStep:
         result = await hass.config_entries.flow.async_configure(
             result["flow_id"],
             {
-                CONF_PREFIX_MEDIA_PLAYER: False,  # Disable
-                CONF_PREFIX_NOTIFY: True,  # Enable
-                CONF_PREFIX_REMOTE: False,  # Disable
-                CONF_PREFIX_BUTTON: True,  # Enable
+                CONF_PREFIX_DEVICE_NAMES: False,
             },
         )
 
         assert result["type"] is FlowResultType.CREATE_ENTRY
-        # Options should be saved in the entry
-        assert result["options"][CONF_PREFIX_MEDIA_PLAYER] is False
-        assert result["options"][CONF_PREFIX_NOTIFY] is True
-        assert result["options"][CONF_PREFIX_REMOTE] is False
-        assert result["options"][CONF_PREFIX_BUTTON] is True
+        # Option should be saved in the entry
+        assert result["options"][CONF_PREFIX_DEVICE_NAMES] is False
 
     @pytest.mark.asyncio
     async def test_entity_options_defaults_enabled(
@@ -1774,10 +1729,7 @@ class TestEntityOptionsStep:
     ) -> None:
         """Test entity options default to enabled when accepting defaults."""
         from custom_components.embymedia.const import (
-            CONF_PREFIX_BUTTON,
-            CONF_PREFIX_MEDIA_PLAYER,
-            CONF_PREFIX_NOTIFY,
-            CONF_PREFIX_REMOTE,
+            CONF_PREFIX_DEVICE_NAMES,
         )
 
         result = await hass.config_entries.flow.async_init(
@@ -1808,8 +1760,5 @@ class TestEntityOptionsStep:
         )
 
         assert result["type"] is FlowResultType.CREATE_ENTRY
-        # All defaults should be True
-        assert result["options"].get(CONF_PREFIX_MEDIA_PLAYER, True) is True
-        assert result["options"].get(CONF_PREFIX_NOTIFY, True) is True
-        assert result["options"].get(CONF_PREFIX_REMOTE, True) is True
-        assert result["options"].get(CONF_PREFIX_BUTTON, True) is True
+        # The device name prefix defaults to enabled
+        assert result["options"][CONF_PREFIX_DEVICE_NAMES] is True

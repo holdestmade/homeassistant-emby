@@ -14,6 +14,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN
 from .coordinator_discovery import EmbyDiscoveryCoordinator
+from .image_proxy import async_get_image_proxy_url
 
 if TYPE_CHECKING:
     from typing import Any
@@ -99,14 +100,18 @@ class EmbyDiscoverySensorBase(
         if image_tags and image_type in image_tags:
             tag = image_tags[image_type]
 
-        url: str | None = self.coordinator.client.get_image_url(
+        # Proxy URL, not a direct Emby URL: these end up in state attributes,
+        # which are recorded and exposed over the REST/WebSocket APIs, so they
+        # must not carry the Emby API key.
+        return async_get_image_proxy_url(
+            hass=self.coordinator.hass,
+            server_id=self.coordinator.server_id,
             item_id=item_id,
             image_type=image_type,
             max_width=max_width,
             max_height=max_height,
             tag=tag,
         )
-        return url
 
     def _get_series_image_url(
         self,
@@ -129,14 +134,15 @@ class EmbyDiscoverySensorBase(
         if not series_id:
             return None
 
-        url: str | None = self.coordinator.client.get_image_url(
+        return async_get_image_proxy_url(
+            hass=self.coordinator.hass,
+            server_id=self.coordinator.server_id,
             item_id=series_id,
             image_type="Primary",
             max_width=max_width,
             max_height=max_height,
             tag=series_primary_tag,
         )
-        return url
 
 
 # =============================================================================

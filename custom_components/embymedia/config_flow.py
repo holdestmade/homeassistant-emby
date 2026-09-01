@@ -28,10 +28,7 @@ from .const import (
     CONF_LIBRARY_SCAN_INTERVAL,
     CONF_MAX_AUDIO_BITRATE,
     CONF_MAX_VIDEO_BITRATE,
-    CONF_PREFIX_BUTTON,
-    CONF_PREFIX_MEDIA_PLAYER,
-    CONF_PREFIX_NOTIFY,
-    CONF_PREFIX_REMOTE,
+    CONF_PREFIX_DEVICE_NAMES,
     CONF_SCAN_INTERVAL,
     CONF_SERVER_SCAN_INTERVAL,
     CONF_TRANSCODING_PROFILE,
@@ -46,10 +43,7 @@ from .const import (
     DEFAULT_IGNORE_WEB_PLAYERS,
     DEFAULT_LIBRARY_SCAN_INTERVAL,
     DEFAULT_PORT,
-    DEFAULT_PREFIX_BUTTON,
-    DEFAULT_PREFIX_MEDIA_PLAYER,
-    DEFAULT_PREFIX_NOTIFY,
-    DEFAULT_PREFIX_REMOTE,
+    DEFAULT_PREFIX_DEVICE_NAMES,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_SERVER_SCAN_INTERVAL,
     DEFAULT_SSL,
@@ -125,7 +119,8 @@ def _build_user_schema(
 class EmbyConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Emby."""
 
-    VERSION = 1
+    # 2: the four per-platform prefix options became one device setting
+    VERSION = 2
 
     def __init__(self) -> None:
         """Initialize the config flow."""
@@ -370,12 +365,9 @@ class EmbyConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             # Create entry with prefix options
             options: dict[str, bool] = {
-                CONF_PREFIX_MEDIA_PLAYER: user_input.get(
-                    CONF_PREFIX_MEDIA_PLAYER, DEFAULT_PREFIX_MEDIA_PLAYER
+                CONF_PREFIX_DEVICE_NAMES: user_input.get(
+                    CONF_PREFIX_DEVICE_NAMES, DEFAULT_PREFIX_DEVICE_NAMES
                 ),
-                CONF_PREFIX_NOTIFY: user_input.get(CONF_PREFIX_NOTIFY, DEFAULT_PREFIX_NOTIFY),
-                CONF_PREFIX_REMOTE: user_input.get(CONF_PREFIX_REMOTE, DEFAULT_PREFIX_REMOTE),
-                CONF_PREFIX_BUTTON: user_input.get(CONF_PREFIX_BUTTON, DEFAULT_PREFIX_BUTTON),
             }
             return await self._async_create_entry_with_user(self._selected_user_id, options)
 
@@ -385,20 +377,8 @@ class EmbyConfigFlow(ConfigFlow, domain=DOMAIN):
             data_schema=vol.Schema(
                 {
                     vol.Optional(
-                        CONF_PREFIX_MEDIA_PLAYER,
-                        default=DEFAULT_PREFIX_MEDIA_PLAYER,
-                    ): bool,
-                    vol.Optional(
-                        CONF_PREFIX_NOTIFY,
-                        default=DEFAULT_PREFIX_NOTIFY,
-                    ): bool,
-                    vol.Optional(
-                        CONF_PREFIX_REMOTE,
-                        default=DEFAULT_PREFIX_REMOTE,
-                    ): bool,
-                    vol.Optional(
-                        CONF_PREFIX_BUTTON,
-                        default=DEFAULT_PREFIX_BUTTON,
+                        CONF_PREFIX_DEVICE_NAMES,
+                        default=DEFAULT_PREFIX_DEVICE_NAMES,
                     ): bool,
                 }
             ),
@@ -805,29 +785,12 @@ class EmbyOptionsFlowHandler(OptionsFlow):
                         CONF_MAX_AUDIO_BITRATE,
                         default=self.config_entry.options.get(CONF_MAX_AUDIO_BITRATE),
                     ): vol.Any(None, vol.All(vol.Coerce(int), vol.Range(min=1))),
-                    # Phase 11: Entity name prefix toggles
+                    # Device name prefix (one device backs every entity for
+                    # a client, so this is a single setting)
                     vol.Optional(
-                        CONF_PREFIX_MEDIA_PLAYER,
+                        CONF_PREFIX_DEVICE_NAMES,
                         default=self.config_entry.options.get(
-                            CONF_PREFIX_MEDIA_PLAYER, DEFAULT_PREFIX_MEDIA_PLAYER
-                        ),
-                    ): bool,
-                    vol.Optional(
-                        CONF_PREFIX_NOTIFY,
-                        default=self.config_entry.options.get(
-                            CONF_PREFIX_NOTIFY, DEFAULT_PREFIX_NOTIFY
-                        ),
-                    ): bool,
-                    vol.Optional(
-                        CONF_PREFIX_REMOTE,
-                        default=self.config_entry.options.get(
-                            CONF_PREFIX_REMOTE, DEFAULT_PREFIX_REMOTE
-                        ),
-                    ): bool,
-                    vol.Optional(
-                        CONF_PREFIX_BUTTON,
-                        default=self.config_entry.options.get(
-                            CONF_PREFIX_BUTTON, DEFAULT_PREFIX_BUTTON
+                            CONF_PREFIX_DEVICE_NAMES, DEFAULT_PREFIX_DEVICE_NAMES
                         ),
                     ): bool,
                     # Phase 15: Discovery sensors toggle
