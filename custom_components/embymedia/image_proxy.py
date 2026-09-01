@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from http import HTTPStatus
 from typing import TYPE_CHECKING
+from urllib.parse import quote, urlencode
 
 import aiohttp
 from aiohttp import web
@@ -17,6 +18,9 @@ if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
 
     from .coordinator import EmbyDataUpdateCoordinator
+
+# Base path of the image proxy view
+IMAGE_PROXY_BASE = "/api/embymedia/image"
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,6 +35,48 @@ STREAM_CHUNK_SIZE = 65536
 
 # Timeout for image fetch requests (seconds)
 IMAGE_FETCH_TIMEOUT = 10
+
+
+def async_get_image_proxy_url(
+    server_id: str,
+    item_id: str,
+    image_type: str = "Primary",
+    max_width: int | None = None,
+    max_height: int | None = None,
+    tag: str | None = None,
+) -> str:
+    """Build a proxy URL for an Emby image.
+
+    Unlike `EmbyClient.get_image_url`, the returned URL carries no API key -
+    the proxy view adds it server-side. Use this anywhere a URL is handed to
+    clients, in particular entity state attributes, which are stored in the
+    recorder database and served over the REST and WebSocket APIs.
+
+    Args:
+        server_id: The Emby server ID.
+        item_id: The item ID.
+        image_type: Image type (Primary, Backdrop, Thumb, etc.).
+        max_width: Optional maximum width.
+        max_height: Optional maximum height.
+        tag: Optional image tag for cache busting.
+
+    Returns:
+        Proxy URL path for the image.
+    """
+    path = (
+        f"{IMAGE_PROXY_BASE}/{quote(server_id, safe='')}"
+        f"/{quote(item_id, safe='')}/{quote(image_type, safe='')}"
+    )
+
+    params: dict[str, str] = {}
+    if max_width is not None:
+        params["maxWidth"] = str(max_width)
+    if max_height is not None:
+        params["maxHeight"] = str(max_height)
+    if tag is not None:
+        params["tag"] = tag
+
+    return f"{path}?{urlencode(params)}" if params else path
 
 
 async def async_setup_image_proxy(hass: HomeAssistant) -> None:
@@ -205,15 +251,19 @@ class EmbyImageProxyView(HomeAssistantView):
         Returns:
             The full URL to fetch the image.
         """
-        url = f"{base_url}/Items/{item_id}/Images/{image_type}"
-        params: list[str] = [f"api_key={api_key}"]
+        # Path segments and query values are percent-encoded: this view is
+        # unauthenticated, so its inputs are untrusted and must not be able to
+        # escape the path or inject extra query parameters into the request
+        # that carries the API key.
+        url = f"{base_url}/Items/{quote(item_id, safe='')}/Images/{quote(image_type, safe='')}"
+        params: dict[str, str] = {"api_key": api_key}
 
         # Forward relevant query parameters
         for key in ("maxWidth", "maxHeight", "quality", "tag"):
             if key in query_params:
-                params.append(f"{key}={query_params[key]}")
+                params[key] = query_params[key]
 
-        return f"{url}?{'&'.join(params)}"
+        return f"{url}?{urlencode(params)}"
 
     def _build_response_headers(
         self,
