@@ -70,11 +70,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     existing key, so refreshing a hot entry dropped an unrelated one
 
 ### Changed
+- **Device name prefix is now a single option** (config entry version 2)
+  - `prefix_media_player`, `prefix_notify` and `prefix_remote` all applied to
+    the same device - one device backs every entity for a client - so only
+    whichever platform registered last took effect. `prefix_button` applied to
+    the shared server device, whose name the integration never sets, so it did
+    nothing at all
+  - All four are replaced by `prefix_device_names`. Existing entries migrate
+    automatically, carrying over the `prefix_media_player` value
+- Browse and media source thumbnails now go through the image proxy, so no
+  Emby API key reaches the browser with a browse response
 - Coordinator first refreshes now run concurrently during setup instead of
   serially, which was one round of API calls per Emby user
+- POST and DELETE now report HTTP status the same way GET does: a 404 raises
+  `EmbyNotFoundError` and a 5xx raises `EmbyServerError`, where both
+  previously surfaced as `EmbyConnectionError`
 
 ### Technical
-- 1924 tests passing; the 19 pre-existing failures against current Home
+- `api.py`: the four near-identical request methods are now thin wrappers over
+  a single `_send`, removing ~150 lines of duplicated status handling, error
+  translation and metrics code. All 74 call sites are unchanged
+
+- 1946 tests passing; the 19 pre-existing failures against current Home
   Assistant were all caused by the entity ID bug above
 - `prefix_button` no longer has any effect: buttons share the server device,
   whose name is registered without a prefix

@@ -43,6 +43,8 @@ from .const import (
     CONF_IGNORED_DEVICES,
     CONF_MAX_AUDIO_BITRATE,
     CONF_MAX_VIDEO_BITRATE,
+    CONF_PREFIX_DEVICE_NAMES,
+    CONF_PREFIX_MEDIA_PLAYER,
     CONF_SCAN_INTERVAL,
     CONF_USER_ID,
     CONF_VERIFY_SSL,
@@ -54,12 +56,14 @@ from .const import (
     DEFAULT_IGNORE_WEB_PLAYERS,
     DEFAULT_LIBRARY_SCAN_INTERVAL,
     DEFAULT_PORT,
+    DEFAULT_PREFIX_DEVICE_NAMES,
     DEFAULT_SCAN_INTERVAL,
     DEFAULT_SERVER_SCAN_INTERVAL,
     DEFAULT_SSL,
     DEFAULT_VERIFY_SSL,
     DEFAULT_VIDEO_CONTAINER,
     DOMAIN,
+    LEGACY_PREFIX_KEYS,
     MAX_SCAN_INTERVAL,
     MIN_SCAN_INTERVAL,
     PLATFORMS,
@@ -155,6 +159,46 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
             data=conf,
         )
     )
+
+    return True
+
+
+async def async_migrate_entry(hass: HomeAssistant, entry: EmbyConfigEntry) -> bool:
+    """Migrate an older config entry to the current schema.
+
+    Version 2 replaced the four per-platform name prefix options with a
+    single device setting. The media_player, notify and remote entities for
+    a client all attach to the same device, so only one of the three could
+    ever take effect - whichever platform registered last won - and the
+    button option applied to the shared server device, whose name the
+    integration does not set at all.
+
+    The media_player value carries over, being the one users actually saw.
+
+    Args:
+        hass: Home Assistant instance.
+        entry: Config entry to migrate.
+
+    Returns:
+        True if the migration succeeded.
+    """
+    if entry.version > 2:
+        # Downgrade from a future version is not supported
+        return False
+
+    if entry.version == 1:
+        options = dict(entry.options)
+        carried_over = options.get(CONF_PREFIX_MEDIA_PLAYER, DEFAULT_PREFIX_DEVICE_NAMES)
+        for legacy_key in LEGACY_PREFIX_KEYS:
+            options.pop(legacy_key, None)
+        options[CONF_PREFIX_DEVICE_NAMES] = bool(carried_over)
+
+        hass.config_entries.async_update_entry(entry, options=options, version=2)
+        _LOGGER.debug(
+            "Migrated Emby config entry %s to version 2 (device name prefix: %s)",
+            entry.entry_id,
+            options[CONF_PREFIX_DEVICE_NAMES],
+        )
 
     return True
 

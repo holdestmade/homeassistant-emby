@@ -8,8 +8,8 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
-    CONF_PREFIX_MEDIA_PLAYER,
-    DEFAULT_PREFIX_MEDIA_PLAYER,
+    CONF_PREFIX_DEVICE_NAMES,
+    DEFAULT_PREFIX_DEVICE_NAMES,
     DOMAIN,
 )
 
@@ -38,15 +38,9 @@ class EmbyEntity(CoordinatorEntity["EmbyDataUpdateCoordinator"]):
 
     Attributes:
         _device_id: The stable device identifier.
-        _prefix_key: Config key for entity's prefix toggle.
-        _prefix_default: Default value for prefix toggle.
     """
 
     _attr_has_entity_name = True
-
-    # Subclasses should override these for their specific prefix settings
-    _prefix_key: str = CONF_PREFIX_MEDIA_PLAYER
-    _prefix_default: bool = DEFAULT_PREFIX_MEDIA_PLAYER
 
     def __init__(
         self,
@@ -92,7 +86,7 @@ class EmbyEntity(CoordinatorEntity["EmbyDataUpdateCoordinator"]):
             DeviceInfo for device registry.
         """
         session = self.session
-        device_name = self._get_device_name(self._prefix_key, self._prefix_default)
+        device_name = self._get_device_name()
 
         if session is None:
             # Fallback device info when session not available
@@ -144,21 +138,19 @@ class EmbyEntity(CoordinatorEntity["EmbyDataUpdateCoordinator"]):
         """
         return f"{self.coordinator.server_id}_{self._device_id}"
 
-    def _get_device_name(self, prefix_key: str, prefix_default: bool) -> str:
+    def _get_device_name(self) -> str:
         """Get device name with optional 'Emby' prefix.
 
-        Phase 11: Allows users to toggle 'Emby' prefix in device names via options.
-
-        Args:
-            prefix_key: The options key for this entity's prefix toggle
-                       (e.g., CONF_PREFIX_MEDIA_PLAYER)
-            prefix_default: The default value for the prefix toggle
+        The media_player, notify and remote entities for a client all attach
+        to one device, so the prefix is a single setting for that device
+        rather than a per-platform one.
 
         Returns:
             Device name with or without 'Emby' prefix based on user setting.
         """
-        # Get the prefix toggle from options (with fallback to default)
-        use_prefix: bool = self.coordinator.config_entry.options.get(prefix_key, prefix_default)
+        use_prefix: bool = self.coordinator.config_entry.options.get(
+            CONF_PREFIX_DEVICE_NAMES, DEFAULT_PREFIX_DEVICE_NAMES
+        )
 
         session = self.session
         if session is not None:

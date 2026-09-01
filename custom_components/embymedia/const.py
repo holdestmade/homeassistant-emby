@@ -80,10 +80,23 @@ CONF_IGNORED_DEVICES: Final = "ignored_devices"
 CONF_IGNORE_WEB_PLAYERS: Final = "ignore_web_players"
 
 # Entity name prefix option keys (Phase 11)
+# Prefix Emby device names with "Emby". One option, because one device backs
+# every entity for a client: media_player, notify and remote all attach to the
+# same device, so a per-platform toggle could not give them different names.
+CONF_PREFIX_DEVICE_NAMES: Final = "prefix_device_names"
+
+# Superseded by CONF_PREFIX_DEVICE_NAMES; retained so config entries created
+# before that consolidation can be migrated (see async_migrate_entry).
 CONF_PREFIX_MEDIA_PLAYER: Final = "prefix_media_player"
 CONF_PREFIX_NOTIFY: Final = "prefix_notify"
 CONF_PREFIX_REMOTE: Final = "prefix_remote"
 CONF_PREFIX_BUTTON: Final = "prefix_button"
+LEGACY_PREFIX_KEYS: Final[tuple[str, ...]] = (
+    CONF_PREFIX_MEDIA_PLAYER,
+    CONF_PREFIX_NOTIFY,
+    CONF_PREFIX_REMOTE,
+    CONF_PREFIX_BUTTON,
+)
 
 # Sensor platform option keys (Phase 12)
 CONF_ENABLE_LIBRARY_SENSORS: Final = "enable_library_sensors"
@@ -104,6 +117,9 @@ DEFAULT_IGNORED_DEVICES: Final[list[str]] = []
 DEFAULT_IGNORE_WEB_PLAYERS: Final = False
 
 # Default prefix values (Phase 11) - all enabled by default
+DEFAULT_PREFIX_DEVICE_NAMES: Final = True
+
+# Legacy defaults, kept for migrating pre-consolidation config entries
 DEFAULT_PREFIX_MEDIA_PLAYER: Final = True
 DEFAULT_PREFIX_NOTIFY: Final = True
 DEFAULT_PREFIX_REMOTE: Final = True

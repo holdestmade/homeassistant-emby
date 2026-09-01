@@ -13,9 +13,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import (
-    CONF_PREFIX_NOTIFY,
     DEFAULT_NOTIFICATION_TIMEOUT_MS,
-    DEFAULT_PREFIX_NOTIFY,
     EmbyConfigEntry,
 )
 from .entity import EmbyEntity
@@ -79,10 +77,6 @@ class EmbyNotifyEntity(EmbyEntity, NotifyEntity):
 
     _attr_supported_features = NotifyEntityFeature.TITLE
     _attr_name: str | None = None  # Phase 11: Use device name only (no suffix)
-
-    # Phase 11: Entity-specific prefix settings
-    _prefix_key: str = CONF_PREFIX_NOTIFY
-    _prefix_default: bool = DEFAULT_PREFIX_NOTIFY
 
     def __init__(
         self,

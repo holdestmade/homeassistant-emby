@@ -44,7 +44,7 @@ def mock_session() -> MagicMock:
 @pytest.fixture
 def mock_coordinator(hass: HomeAssistant, mock_session: MagicMock) -> MagicMock:
     """Create a mock coordinator."""
-    from custom_components.embymedia.const import CONF_PREFIX_MEDIA_PLAYER
+    from custom_components.embymedia.const import CONF_PREFIX_DEVICE_NAMES
 
     coordinator = MagicMock()
     coordinator.server_id = "server-123"
@@ -55,7 +55,7 @@ def mock_coordinator(hass: HomeAssistant, mock_session: MagicMock) -> MagicMock:
     coordinator.get_session = MagicMock(return_value=mock_session)
     # Phase 11: Add config_entry with default prefix settings (enabled by default)
     mock_config_entry = MagicMock()
-    mock_config_entry.options = {CONF_PREFIX_MEDIA_PLAYER: True}
+    mock_config_entry.options = {CONF_PREFIX_DEVICE_NAMES: True}
     coordinator.config_entry = mock_config_entry
     return coordinator
 
@@ -186,11 +186,11 @@ class TestEmbyEntityDeviceInfo:
         mock_session: MagicMock,
     ) -> None:
         """Test device info with 'Emby' prefix when session is available and prefix enabled."""
-        from custom_components.embymedia.const import CONF_PREFIX_MEDIA_PLAYER
+        from custom_components.embymedia.const import CONF_PREFIX_DEVICE_NAMES
         from custom_components.embymedia.entity import EmbyEntity
 
         # Ensure prefix is enabled (default)
-        mock_coordinator.config_entry.options = {CONF_PREFIX_MEDIA_PLAYER: True}
+        mock_coordinator.config_entry.options = {CONF_PREFIX_DEVICE_NAMES: True}
         mock_coordinator.get_session.return_value = mock_session
 
         entity = EmbyEntity(
@@ -214,11 +214,11 @@ class TestEmbyEntityDeviceInfo:
         mock_session: MagicMock,
     ) -> None:
         """Test device info without prefix when prefix disabled."""
-        from custom_components.embymedia.const import CONF_PREFIX_MEDIA_PLAYER
+        from custom_components.embymedia.const import CONF_PREFIX_DEVICE_NAMES
         from custom_components.embymedia.entity import EmbyEntity
 
         # Disable prefix
-        mock_coordinator.config_entry.options = {CONF_PREFIX_MEDIA_PLAYER: False}
+        mock_coordinator.config_entry.options = {CONF_PREFIX_DEVICE_NAMES: False}
         mock_coordinator.get_session.return_value = mock_session
 
         entity = EmbyEntity(
@@ -241,10 +241,10 @@ class TestEmbyEntityDeviceInfo:
         mock_coordinator: MagicMock,
     ) -> None:
         """Test device info fallback when session is not available."""
-        from custom_components.embymedia.const import CONF_PREFIX_MEDIA_PLAYER
+        from custom_components.embymedia.const import CONF_PREFIX_DEVICE_NAMES
         from custom_components.embymedia.entity import EmbyEntity
 
-        mock_coordinator.config_entry.options = {CONF_PREFIX_MEDIA_PLAYER: True}
+        mock_coordinator.config_entry.options = {CONF_PREFIX_DEVICE_NAMES: True}
         mock_coordinator.get_session.return_value = None
 
         entity = EmbyEntity(
@@ -291,15 +291,12 @@ class TestEmbyEntityDeviceNameHelper:
         mock_session: MagicMock,
     ) -> None:
         """Test device name prefixed with 'Emby' when toggle is ON."""
-        from custom_components.embymedia.const import (
-            CONF_PREFIX_MEDIA_PLAYER,
-            DEFAULT_PREFIX_MEDIA_PLAYER,
-        )
+        from custom_components.embymedia.const import CONF_PREFIX_DEVICE_NAMES
         from custom_components.embymedia.entity import EmbyEntity
 
         # Setup mock config entry with prefix enabled
         mock_config_entry = MagicMock()
-        mock_config_entry.options = {CONF_PREFIX_MEDIA_PLAYER: True}
+        mock_config_entry.options = {CONF_PREFIX_DEVICE_NAMES: True}
         mock_coordinator.config_entry = mock_config_entry
         mock_coordinator.get_session.return_value = mock_session
 
@@ -308,7 +305,7 @@ class TestEmbyEntityDeviceNameHelper:
             device_id="device-abc-123",
         )
 
-        result = entity._get_device_name(CONF_PREFIX_MEDIA_PLAYER, DEFAULT_PREFIX_MEDIA_PLAYER)
+        result = entity._get_device_name()
 
         assert result == "Emby Living Room TV"
 
@@ -319,15 +316,12 @@ class TestEmbyEntityDeviceNameHelper:
         mock_session: MagicMock,
     ) -> None:
         """Test device name without prefix when toggle is OFF."""
-        from custom_components.embymedia.const import (
-            CONF_PREFIX_MEDIA_PLAYER,
-            DEFAULT_PREFIX_MEDIA_PLAYER,
-        )
+        from custom_components.embymedia.const import CONF_PREFIX_DEVICE_NAMES
         from custom_components.embymedia.entity import EmbyEntity
 
         # Setup mock config entry with prefix disabled
         mock_config_entry = MagicMock()
-        mock_config_entry.options = {CONF_PREFIX_MEDIA_PLAYER: False}
+        mock_config_entry.options = {CONF_PREFIX_DEVICE_NAMES: False}
         mock_coordinator.config_entry = mock_config_entry
         mock_coordinator.get_session.return_value = mock_session
 
@@ -336,7 +330,7 @@ class TestEmbyEntityDeviceNameHelper:
             device_id="device-abc-123",
         )
 
-        result = entity._get_device_name(CONF_PREFIX_MEDIA_PLAYER, DEFAULT_PREFIX_MEDIA_PLAYER)
+        result = entity._get_device_name()
 
         assert result == "Living Room TV"
 
@@ -347,10 +341,6 @@ class TestEmbyEntityDeviceNameHelper:
         mock_session: MagicMock,
     ) -> None:
         """Test device name uses default when option not set."""
-        from custom_components.embymedia.const import (
-            CONF_PREFIX_MEDIA_PLAYER,
-            DEFAULT_PREFIX_MEDIA_PLAYER,
-        )
         from custom_components.embymedia.entity import EmbyEntity
 
         # Setup mock config entry with no prefix option (uses default=True)
@@ -364,7 +354,7 @@ class TestEmbyEntityDeviceNameHelper:
             device_id="device-abc-123",
         )
 
-        result = entity._get_device_name(CONF_PREFIX_MEDIA_PLAYER, DEFAULT_PREFIX_MEDIA_PLAYER)
+        result = entity._get_device_name()
 
         # Default is True, so should be prefixed
         assert result == "Emby Living Room TV"
@@ -375,15 +365,12 @@ class TestEmbyEntityDeviceNameHelper:
         mock_coordinator: MagicMock,
     ) -> None:
         """Test fallback device name when session is None."""
-        from custom_components.embymedia.const import (
-            CONF_PREFIX_MEDIA_PLAYER,
-            DEFAULT_PREFIX_MEDIA_PLAYER,
-        )
+        from custom_components.embymedia.const import CONF_PREFIX_DEVICE_NAMES
         from custom_components.embymedia.entity import EmbyEntity
 
         # Setup mock config entry with prefix enabled
         mock_config_entry = MagicMock()
-        mock_config_entry.options = {CONF_PREFIX_MEDIA_PLAYER: True}
+        mock_config_entry.options = {CONF_PREFIX_DEVICE_NAMES: True}
         mock_coordinator.config_entry = mock_config_entry
         mock_coordinator.get_session.return_value = None
 
@@ -392,7 +379,7 @@ class TestEmbyEntityDeviceNameHelper:
             device_id="device-abc-123",
         )
 
-        result = entity._get_device_name(CONF_PREFIX_MEDIA_PLAYER, DEFAULT_PREFIX_MEDIA_PLAYER)
+        result = entity._get_device_name()
 
         # Should use fallback name (first 8 chars of device ID)
         assert result == "Emby Client device-a"
@@ -403,15 +390,12 @@ class TestEmbyEntityDeviceNameHelper:
         mock_coordinator: MagicMock,
     ) -> None:
         """Test fallback device name without prefix when toggle is OFF."""
-        from custom_components.embymedia.const import (
-            CONF_PREFIX_MEDIA_PLAYER,
-            DEFAULT_PREFIX_MEDIA_PLAYER,
-        )
+        from custom_components.embymedia.const import CONF_PREFIX_DEVICE_NAMES
         from custom_components.embymedia.entity import EmbyEntity
 
         # Setup mock config entry with prefix disabled
         mock_config_entry = MagicMock()
-        mock_config_entry.options = {CONF_PREFIX_MEDIA_PLAYER: False}
+        mock_config_entry.options = {CONF_PREFIX_DEVICE_NAMES: False}
         mock_coordinator.config_entry = mock_config_entry
         mock_coordinator.get_session.return_value = None
 
@@ -420,7 +404,7 @@ class TestEmbyEntityDeviceNameHelper:
             device_id="device-abc-123",
         )
 
-        result = entity._get_device_name(CONF_PREFIX_MEDIA_PLAYER, DEFAULT_PREFIX_MEDIA_PLAYER)
+        result = entity._get_device_name()
 
         # Should use fallback name without prefix
         assert result == "Client device-a"
@@ -458,10 +442,10 @@ class TestEmbyEntityDeviceNaming:
         mock_session: MagicMock,
     ) -> None:
         """The device name carries the 'Emby' prefix when enabled."""
-        from custom_components.embymedia.const import CONF_PREFIX_MEDIA_PLAYER
+        from custom_components.embymedia.const import CONF_PREFIX_DEVICE_NAMES
         from custom_components.embymedia.entity import EmbyEntity
 
-        mock_coordinator.config_entry.options = {CONF_PREFIX_MEDIA_PLAYER: True}
+        mock_coordinator.config_entry.options = {CONF_PREFIX_DEVICE_NAMES: True}
         mock_coordinator.get_session.return_value = mock_session
 
         entity = EmbyEntity(coordinator=mock_coordinator, device_id="device-abc-123")
@@ -475,10 +459,10 @@ class TestEmbyEntityDeviceNaming:
         mock_session: MagicMock,
     ) -> None:
         """The device name drops the prefix when disabled."""
-        from custom_components.embymedia.const import CONF_PREFIX_MEDIA_PLAYER
+        from custom_components.embymedia.const import CONF_PREFIX_DEVICE_NAMES
         from custom_components.embymedia.entity import EmbyEntity
 
-        mock_coordinator.config_entry.options = {CONF_PREFIX_MEDIA_PLAYER: False}
+        mock_coordinator.config_entry.options = {CONF_PREFIX_DEVICE_NAMES: False}
         mock_coordinator.get_session.return_value = mock_session
 
         entity = EmbyEntity(coordinator=mock_coordinator, device_id="device-abc-123")
@@ -491,10 +475,10 @@ class TestEmbyEntityDeviceNaming:
         mock_coordinator: MagicMock,
     ) -> None:
         """The device name falls back to a short device id with no session."""
-        from custom_components.embymedia.const import CONF_PREFIX_MEDIA_PLAYER
+        from custom_components.embymedia.const import CONF_PREFIX_DEVICE_NAMES
         from custom_components.embymedia.entity import EmbyEntity
 
-        mock_coordinator.config_entry.options = {CONF_PREFIX_MEDIA_PLAYER: True}
+        mock_coordinator.config_entry.options = {CONF_PREFIX_DEVICE_NAMES: True}
         mock_coordinator.get_session.return_value = None
 
         entity = EmbyEntity(coordinator=mock_coordinator, device_id="device-abc-123")
