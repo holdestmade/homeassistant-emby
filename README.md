@@ -8,14 +8,6 @@
   <strong>Your media server. Your smart home. Seamlessly connected.</strong>
 </p>
 
-<p align="center">
-  <a href="https://github.com/hacs/integration"><img src="https://img.shields.io/badge/HACS-Custom-41BDF5.svg" alt="HACS"></a>
-  <a href="https://github.com/troykelly/homeassistant-emby/releases"><img src="https://img.shields.io/github/v/release/troykelly/homeassistant-emby" alt="GitHub Release"></a>
-  <a href="https://github.com/troykelly/homeassistant-emby/actions"><img src="https://img.shields.io/github/actions/workflow/status/troykelly/homeassistant-emby/test.yml?label=tests" alt="Tests"></a>
-  <a href="https://codecov.io/gh/troykelly/homeassistant-emby"><img src="https://img.shields.io/codecov/c/github/troykelly/homeassistant-emby" alt="Coverage"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/troykelly/homeassistant-emby" alt="License"></a>
-</p>
-
 ---
 
 <h2 align="center">🚀 Quick Start</h2>
