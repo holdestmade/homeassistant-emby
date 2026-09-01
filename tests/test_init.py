@@ -540,6 +540,57 @@ class TestServerDeviceRegistration:
             assert server_device.sw_version == mock_server_info["Version"]
 
     @pytest.mark.asyncio
+    async def test_server_device_id_shared_with_coordinator(
+        self,
+        hass: HomeAssistant,
+        mock_config_entry: MockConfigEntry,
+        mock_server_info: dict[str, Any],
+    ) -> None:
+        """Test the server device's registry id is shared with the coordinator.
+
+        Entities link themselves to the server with DeviceInfo's
+        `via_device_id`, which needs the registry id rather than the
+        identifier tuple used by the deprecated `via_device`.
+        """
+        from homeassistant.helpers import device_registry as dr
+
+        mock_config_entry.add_to_hass(hass)
+
+        session_coordinator = create_mock_session_coordinator()
+        server_coordinator = create_mock_server_coordinator()
+        library_coordinator = create_mock_library_coordinator()
+
+        with (
+            patch("custom_components.embymedia.EmbyClient", autospec=True) as mock_client_class,
+            patch(
+                "custom_components.embymedia.EmbyDataUpdateCoordinator",
+            ) as mock_session_coordinator_class,
+            patch(
+                "custom_components.embymedia.EmbyServerCoordinator",
+            ) as mock_server_coordinator_class,
+            patch(
+                "custom_components.embymedia.EmbyLibraryCoordinator",
+            ) as mock_library_coordinator_class,
+        ):
+            client = mock_client_class.return_value
+            client.async_validate_connection = AsyncMock(return_value=True)
+            client.async_get_server_info = AsyncMock(return_value=mock_server_info)
+
+            mock_session_coordinator_class.return_value = session_coordinator
+            mock_server_coordinator_class.return_value = server_coordinator
+            mock_library_coordinator_class.return_value = library_coordinator
+
+            await hass.config_entries.async_setup(mock_config_entry.entry_id)
+
+            device_registry = dr.async_get(hass)
+            server_device = device_registry.async_get_device(
+                identifiers={(DOMAIN, mock_server_info["Id"])}
+            )
+
+            assert server_device is not None
+            assert session_coordinator.server_device_id == server_device.id
+
+    @pytest.mark.asyncio
     async def test_server_device_has_config_entry(
         self,
         hass: HomeAssistant,

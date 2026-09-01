@@ -87,6 +87,10 @@ class EmbyDataUpdateCoordinator(DataUpdateCoordinator[dict[str, EmbySession]]):
     server_id: str
     server_name: str
     config_entry: EmbyConfigEntry
+    # Device registry id of the Emby server device, set during setup once the
+    # server device is registered. Entities use it to link themselves to the
+    # server via DeviceInfo's `via_device_id` (see entity.py).
+    server_device_id: str | None
 
     def __init__(
         self,
@@ -120,6 +124,7 @@ class EmbyDataUpdateCoordinator(DataUpdateCoordinator[dict[str, EmbySession]]):
         self.server_id = server_id
         self.server_name = server_name
         self.config_entry = config_entry
+        self.server_device_id = None
         self._user_id = user_id
         self._previous_sessions: set[str] = set()
         self._websocket: EmbyWebSocket | None = None
