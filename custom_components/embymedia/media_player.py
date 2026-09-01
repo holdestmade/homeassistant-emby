@@ -42,6 +42,7 @@ if TYPE_CHECKING:
 
 from .const import EmbyBrowseItem
 from .coordinator import EmbyDataUpdateCoordinator
+from .image_proxy import async_get_image_proxy_url
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -1592,14 +1593,15 @@ class EmbyMediaPlayer(EmbyEntity, MediaPlayerEntity):
             BrowseMedia representation of the library.
         """
         coordinator: EmbyDataUpdateCoordinator = self.coordinator
-        client = coordinator.client
 
         # Get thumbnail if available
         thumbnail: str | None = None
         image_tags = library.get("ImageTags", {})
         if "Primary" in image_tags:
-            thumbnail = client.get_image_url(
-                library["Id"], image_type="Primary", tag=image_tags["Primary"]
+            thumbnail = async_get_image_proxy_url(
+                server_id=coordinator.server_id,
+                item_id=library["Id"],
+                tag=image_tags["Primary"],
             )
 
         # Use special content types for each library type
@@ -1640,7 +1642,6 @@ class EmbyMediaPlayer(EmbyEntity, MediaPlayerEntity):
             BrowseMedia representation of the item.
         """
         coordinator: EmbyDataUpdateCoordinator = self.coordinator
-        client = coordinator.client
 
         item_type = item.get("Type", "Unknown")
         media_class = emby_type_to_media_class(item_type)
@@ -1667,8 +1668,10 @@ class EmbyMediaPlayer(EmbyEntity, MediaPlayerEntity):
         thumbnail: str | None = None
         image_tags = item.get("ImageTags", {})
         if "Primary" in image_tags:
-            thumbnail = client.get_image_url(
-                item["Id"], image_type="Primary", tag=image_tags["Primary"]
+            thumbnail = async_get_image_proxy_url(
+                server_id=coordinator.server_id,
+                item_id=item["Id"],
+                tag=image_tags["Primary"],
             )
 
         return BrowseMedia(
@@ -1692,14 +1695,15 @@ class EmbyMediaPlayer(EmbyEntity, MediaPlayerEntity):
             BrowseMedia representation of the season.
         """
         coordinator: EmbyDataUpdateCoordinator = self.coordinator
-        client = coordinator.client
 
         # Get thumbnail if available
         thumbnail: str | None = None
         image_tags = season.get("ImageTags", {})
         if "Primary" in image_tags:
-            thumbnail = client.get_image_url(
-                season["Id"], image_type="Primary", tag=image_tags["Primary"]
+            thumbnail = async_get_image_proxy_url(
+                server_id=coordinator.server_id,
+                item_id=season["Id"],
+                tag=image_tags["Primary"],
             )
 
         return BrowseMedia(
@@ -1722,14 +1726,15 @@ class EmbyMediaPlayer(EmbyEntity, MediaPlayerEntity):
             BrowseMedia representation of the album.
         """
         coordinator: EmbyDataUpdateCoordinator = self.coordinator
-        client = coordinator.client
 
         # Get thumbnail if available
         thumbnail: str | None = None
         image_tags = album.get("ImageTags", {})
         if "Primary" in image_tags:
-            thumbnail = client.get_image_url(
-                album["Id"], image_type="Primary", tag=image_tags["Primary"]
+            thumbnail = async_get_image_proxy_url(
+                server_id=coordinator.server_id,
+                item_id=album["Id"],
+                tag=image_tags["Primary"],
             )
 
         return BrowseMedia(
@@ -1752,14 +1757,15 @@ class EmbyMediaPlayer(EmbyEntity, MediaPlayerEntity):
             BrowseMedia representation of the track.
         """
         coordinator: EmbyDataUpdateCoordinator = self.coordinator
-        client = coordinator.client
 
         # Get thumbnail if available
         thumbnail: str | None = None
         image_tags = track.get("ImageTags", {})
         if "Primary" in image_tags:
-            thumbnail = client.get_image_url(
-                track["Id"], image_type="Primary", tag=image_tags["Primary"]
+            thumbnail = async_get_image_proxy_url(
+                server_id=coordinator.server_id,
+                item_id=track["Id"],
+                tag=image_tags["Primary"],
             )
 
         return BrowseMedia(
@@ -2309,15 +2315,16 @@ class EmbyMediaPlayer(EmbyEntity, MediaPlayerEntity):
             BrowseMedia representation of the person.
         """
         coordinator: EmbyDataUpdateCoordinator = self.coordinator
-        client = coordinator.client
 
         # Get thumbnail if available
         thumbnail: str | None = None
         image_tags = person.get("ImageTags", {})
         if isinstance(image_tags, dict) and "Primary" in image_tags:
             person_id = str(person.get("Id", ""))
-            thumbnail = client.get_image_url(
-                person_id, image_type="Primary", tag=str(image_tags["Primary"])
+            thumbnail = async_get_image_proxy_url(
+                server_id=coordinator.server_id,
+                item_id=person_id,
+                tag=str(image_tags["Primary"]),
             )
 
         return BrowseMedia(

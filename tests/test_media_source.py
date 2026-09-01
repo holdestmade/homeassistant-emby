@@ -138,7 +138,9 @@ class TestBrowseMediaSource:
         assert result is not None
         assert len(result.children) == 2
         assert result.children[0].title == "Movies"
-        assert result.children[0].thumbnail == "http://emby.local:8096/image"
+        assert result.children[0].thumbnail == (
+            "/api/embymedia/image/test-server-id-12345/lib-movies/Primary"
+        )
         assert result.children[1].title == "TV Shows"
         assert result.children[1].thumbnail is None  # No image tag
 
@@ -651,8 +653,10 @@ class TestItemToBrowseMediaSource:
 
         result = media_source._item_to_browse_media_source(mock_coordinator, item)
 
-        assert result.thumbnail == "http://emby/image"
-        mock_client.get_image_url.assert_called_once()
+        # Thumbnails go through the image proxy, so no API key reaches the
+        # browser with the browse response
+        assert result.thumbnail == ("/api/embymedia/image/server-123/movie-123/Primary")
+        mock_client.get_image_url.assert_not_called()
 
     def test_item_without_image(
         self,

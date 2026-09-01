@@ -198,3 +198,55 @@ class TestProxyUpstreamUrlIsEncoded:
         )
 
         assert "/Items/..%2F..%2FSystem%2FInfo/Images/Primary" in url
+
+
+class TestBrowseThumbnailsUseTheProxy:
+    """Browse results are sent to the browser, so they must carry no key.
+
+    `BrowseMedia.thumbnail` and `BrowseMediaSource.thumbnail` are returned
+    over the WebSocket API and rendered by the frontend. They previously
+    used `get_image_url`, putting the API key in the page.
+    """
+
+    def test_no_direct_image_urls_in_browse_helpers(self) -> None:
+        """No browse helper may build a thumbnail with `get_image_url`."""
+        import inspect
+
+        from custom_components.embymedia import media_player, media_source
+
+        for module in (media_player, media_source):
+            source = inspect.getsource(module)
+            for line in source.splitlines():
+                if "thumbnail" in line and "get_image_url" in line:
+                    raise AssertionError(
+                        f"{module.__name__} builds a thumbnail with "
+                        f"get_image_url, which embeds the API key: {line.strip()}"
+                    )
+
+    def test_browse_media_thumbnail_is_a_proxy_path(self) -> None:
+        """A browse item's thumbnail is a proxy path with no credentials."""
+        from unittest.mock import MagicMock
+
+        from custom_components.embymedia.api import EmbyClient
+        from custom_components.embymedia.media_player import EmbyMediaPlayer
+
+        coordinator = MagicMock()
+        coordinator.server_id = "server123"
+        coordinator.client = EmbyClient(
+            host="emby.local", port=8096, api_key=API_KEY, ssl=True
+        )
+        coordinator.config_entry.options = {}
+
+        player = EmbyMediaPlayer(coordinator, "device-1")
+        result = player._album_to_browse_media(
+            {
+                "Id": "album-1",
+                "Name": "Album",
+                "Type": "MusicAlbum",
+                "ImageTags": {"Primary": "tag1"},
+            }
+        )
+
+        assert result.thumbnail is not None
+        assert result.thumbnail.startswith("/api/embymedia/image/server123/album-1/")
+        assert API_KEY not in result.thumbnail
