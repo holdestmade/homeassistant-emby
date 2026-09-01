@@ -30,10 +30,10 @@ Everything you need to connect and customize your Emby Media integration.
 
 | Field | Required | Default | Description |
 |-------|----------|---------|-------------|
-| **Host** | ✓ | — | Emby server hostname or IP address |
-| **Port** | ✓ | 8096 | Server port number |
+| **Host** | Yes | — | Emby server hostname or IP address |
+| **Port** | Yes | 8096 | Server port number |
 | **Use SSL** | | false | Enable for HTTPS connections |
-| **API Key** | ✓ | — | API key from Emby dashboard |
+| **API Key** | Yes | — | API key from Emby dashboard |
 | **Verify SSL** | | true | Validate SSL certificate |
 
 ### Connection Examples
@@ -46,7 +46,7 @@ Everything you need to connect and customize your Emby Media integration.
 ```
 Host: 192.168.1.100
 Port: 8096
-Use SSL: ☐
+Use SSL: unchecked
 ```
 
 </td>
@@ -56,8 +56,8 @@ Use SSL: ☐
 ```
 Host: emby.local
 Port: 8920
-Use SSL: ☑
-Verify SSL: ☐
+Use SSL: checked
+Verify SSL: unchecked
 ```
 
 </td>
@@ -67,8 +67,8 @@ Verify SSL: ☐
 ```
 Host: emby.example.com
 Port: 443
-Use SSL: ☑
-Verify SSL: ☑
+Use SSL: checked
+Verify SSL: checked
 ```
 
 </td>
@@ -86,7 +86,7 @@ Change these anytime: **Settings** → **Devices & Services** → **Emby Media**
 | Option | Default | Range | Description |
 |--------|---------|-------|-------------|
 | **Scan Interval** | 10 | 5-300s | How often to poll for session updates |
-| **Enable WebSocket** | ✓ | — | Real-time updates (recommended) |
+| **Enable WebSocket** | Yes | — | Real-time updates (recommended) |
 | **WebSocket Interval** | 1500 | 500-10000ms | Session subscription rate |
 | **Library Scan Interval** | 1 hour | 1-24h | How often to update library counts |
 | **Server Scan Interval** | 5 min | 5m-1h | How often to check server status |
@@ -119,7 +119,7 @@ Change these anytime: **Settings** → **Devices & Services** → **Emby Media**
 | Option | Default | Description |
 |--------|---------|-------------|
 | **Ignored Devices** | — | Comma-separated list of device names to hide |
-| **Ignore Web Players** | ✗ | Hide all browser-based sessions |
+| **Ignore Web Players** | No | Hide all browser-based sessions |
 
 **Example:**
 ```
@@ -130,22 +130,60 @@ Guest iPad, Kids Tablet, Web Player
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| **Prefix Media Players** | ✓ | Add "Emby" prefix to media player names |
-| **Prefix Remote** | ✓ | Add "Emby" prefix to remote entity names |
-| **Prefix Notify** | ✓ | Add "Emby" prefix to notify entity names |
-| **Prefix Button** | ✓ | Add "Emby" prefix to button entity names |
+| **Prefix Emby device names with "Emby"** | Yes | Add "Emby" prefix to Emby client device names |
 
 **With prefix ON:** `media_player.emby_living_room_tv`
 **With prefix OFF:** `media_player.living_room_tv`
+
+Each Emby client is one device in Home Assistant, shared by its media
+player, remote and notify entities, so the prefix is a single setting for
+that device rather than one per platform. Entity IDs are derived from the
+device name, so they follow the same setting.
+
+Changing this affects newly discovered devices. Entities that already exist
+keep their current entity IDs, which protects existing automations and
+dashboards; rename them from the entity settings if you want them updated.
+
+Earlier versions offered four separate prefix options
+(`prefix_media_player`, `prefix_notify`, `prefix_remote` and
+`prefix_button`). They are replaced automatically when the integration
+first loads, carrying over the media player setting.
+
+### Discovery Sensors
+
+| Option | Default | Range | Description |
+|--------|---------|-------|-------------|
+| **Enable Discovery Sensors** | Yes | — | Next Up, Continue Watching, Recently Added and Suggestions |
+| **Discovery Scan Interval** | 900 | 300-3600s | How often discovery data refreshes |
+
+Discovery sensors are created per Emby user, so a server with several users
+produces several sets. Turn them off if you only want playback control, which
+also removes their polling entirely.
+
+Each sensor exposes an `items` attribute holding the list of media, with an
+`image_url` for artwork:
+
+```jinja
+{{ state_attr('sensor.emby_next_up', 'items')[0].name }}
+{{ state_attr('sensor.emby_next_up', 'items')[0].image_url }}
+```
 
 ### Transcoding Options
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| **Direct Play** | ✓ | Try direct play before transcoding |
+| **Direct Play** | Yes | Try direct play before transcoding |
+| **Transcoding Profile** | universal | Device profile used when transcoding |
 | **Video Container** | mp4 | Container format: mp4, mkv, webm |
 | **Max Video Bitrate** | — | Limit video bitrate (kbps) |
 | **Max Audio Bitrate** | — | Limit audio bitrate (kbps) |
+
+**Transcoding Profile:**
+- `universal` — Safe defaults that suit most clients
+- `chromecast` — Tuned for Chromecast targets
+- `roku` — Tuned for Roku devices
+- `appletv` — Tuned for Apple TV
+- `audio_only` — Audio streams only, for speaker targets
 
 **Video Container:**
 - `mp4` — Most compatible, works everywhere
@@ -218,22 +256,22 @@ If no user is selected, API key permissions apply.
 
 ### "Connection Failed"
 
-1. ✓ Verify Emby is running: `http://your-server:8096`
-2. ✓ Check firewall allows the port
-3. ✓ Try IP address instead of hostname
-4. ✓ For HTTPS, try disabling "Verify SSL"
+1. Verify Emby is running: `http://your-server:8096`
+2. Check firewall allows the port
+3. Try IP address instead of hostname
+4. For HTTPS, try disabling "Verify SSL"
 
 ### "Invalid API Key"
 
-1. ✓ Generate a **new** key in Emby Dashboard
-2. ✓ Check for extra spaces when pasting
-3. ✓ Verify key hasn't been revoked
+1. Generate a **new** key in Emby Dashboard
+2. Check for extra spaces when pasting
+3. Verify key hasn't been revoked
 
 ### "No Devices Found"
 
-1. ✓ Open Emby on at least one client device
-2. ✓ Ensure device supports remote control
-3. ✓ Check device isn't in "Ignored Devices" list
+1. Open Emby on at least one client device
+2. Ensure device supports remote control
+3. Check device isn't in "Ignored Devices" list
 
 ### Changes Not Taking Effect
 

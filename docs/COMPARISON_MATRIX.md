@@ -21,9 +21,9 @@ This document provides a comprehensive comparison between this custom Emby Media
 | **Status**           | Active Development | Legacy        | Active        |
 | **Entity Platforms** | 6                  | 1             | 4             |
 | **Services**         | 20+                | 0             | 1             |
-| **Config Flow**      | ✅ Full            | ❌ YAML Only  | ✅ Full       |
-| **WebSocket**        | ✅ Real-time       | ❌ Polling    | ✅ Real-time  |
-| **Voice Assist**     | ✅ search_media    | ❌            | ❌            |
+| **Config Flow**      | Yes Full            | No YAML Only  | Yes Full       |
+| **WebSocket**        | Yes Real-time       | No Polling    | Yes Real-time  |
+| **Voice Assist**     | Yes search_media    | No            | No            |
 | **Quality**          | Modern (2025)      | Legacy        | Modern        |
 
 ---
@@ -32,32 +32,32 @@ This document provides a comprehensive comparison between this custom Emby Media
 
 | Feature                    | embymedia        | Official Emby | Official Plex          |
 | -------------------------- | ---------------- | ------------- | ---------------------- |
-| **Config Flow (UI Setup)** | ✅ Full          | ❌ YAML only  | ✅ Full                |
-| **Options Flow**           | ✅ Extensive     | ❌            | ✅ Limited             |
-| **Reauth Flow**            | ✅               | ❌            | ✅                     |
-| **SSDP Discovery**         | ❌               | ❌            | ❌                     |
-| **Zeroconf Discovery**     | ❌               | ❌            | ✅                     |
-| **GDM Discovery**          | N/A              | N/A           | ✅                     |
-| **OAuth Authentication**   | ❌ (API Key)     | ❌ (API Key)  | ✅ (plex.tv)           |
-| **Multi-Server Support**   | ✅               | ⚠️ Manual     | ✅                     |
-| **Multi-User Support**     | ✅ Per-user data | ❌            | ✅ Per-user monitoring |
-| **SSL/TLS Support**        | ✅ Configurable  | ✅ Basic      | ✅ Full                |
-| **Verify SSL Option**      | ✅               | ❌            | ✅                     |
+| **Config Flow (UI Setup)** | Yes Full          | No YAML only  | Yes Full                |
+| **Options Flow**           | Yes Extensive     | No            | Yes Limited             |
+| **Reauth Flow**            | Yes               | No            | Yes                     |
+| **SSDP Discovery**         | No               | No            | No                     |
+| **Zeroconf Discovery**     | No               | No            | Yes                     |
+| **GDM Discovery**          | N/A              | N/A           | Yes                     |
+| **OAuth Authentication**   | No (API Key)     | No (API Key)  | Yes (plex.tv)           |
+| **Multi-Server Support**   | Yes               | Partial (Manual)     | Yes                     |
+| **Multi-User Support**     | Yes Per-user data | No            | Yes Per-user monitoring |
+| **SSL/TLS Support**        | Yes Configurable  | Yes Basic      | Yes Full                |
+| **Verify SSL Option**      | Yes               | No            | Yes                     |
 
 ### Configuration Options Comparison
 
 | Option                | embymedia       | Official Emby | Official Plex |
 | --------------------- | --------------- | ------------- | ------------- |
-| Host/Port/API Key     | ✅              | ✅            | ✅            |
-| Polling Interval      | ✅ 5-300s       | ❌ Fixed      | ❌ Fixed      |
-| Library Scan Interval | ✅ 1-24h        | ❌            | ❌            |
-| WebSocket Toggle      | ✅              | N/A           | ❌ Always on  |
-| Ignored Devices       | ✅              | ❌            | ❌            |
-| Ignore Web Players    | ✅              | ❌            | ✅            |
-| Entity Prefix Control | ✅ Per-platform | ❌            | ❌            |
-| Transcoding Settings  | ✅ Full         | ❌            | ❌            |
-| Monitored Users       | ✅              | ❌            | ✅            |
-| Episode Artwork       | N/A             | N/A           | ✅            |
+| Host/Port/API Key     | Yes              | Yes            | Yes            |
+| Polling Interval      | Yes 5-300s       | No Fixed      | No Fixed      |
+| Library Scan Interval | Yes 1-24h        | No            | No            |
+| WebSocket Toggle      | Yes              | N/A           | No Always on  |
+| Ignored Devices       | Yes              | No            | No            |
+| Ignore Web Players    | Yes              | No            | Yes            |
+| Entity Prefix Control | Yes Per-platform | No            | No            |
+| Transcoding Settings  | Yes Full         | No            | No            |
+| Monitored Users       | Yes              | No            | Yes            |
+| Episode Artwork       | N/A             | N/A           | Yes            |
 
 ---
 
@@ -65,45 +65,45 @@ This document provides a comprehensive comparison between this custom Emby Media
 
 | Platform          | embymedia        | Official Emby  | Official Plex   |
 | ----------------- | ---------------- | -------------- | --------------- |
-| **Media Player**  | ✅ Per-session   | ✅ Per-session | ✅ Per-client   |
-| **Sensor**        | ✅ 15+ types     | ❌             | ✅ 2 types      |
-| **Binary Sensor** | ✅ 5 types       | ❌             | ❌              |
-| **Remote**        | ✅ Navigation    | ❌             | ❌              |
-| **Button**        | ✅ Multiple      | ❌             | ✅ Scan clients |
-| **Notify**        | ✅ On-screen     | ❌             | ❌              |
-| **Image**         | ✅ Discovery art | ❌             | ❌              |
-| **Update**        | ❌               | ❌             | ✅              |
+| **Media Player**  | Yes Per-session   | Yes Per-session | Yes Per-client   |
+| **Sensor**        | Yes 15+ types     | No             | Yes 2 types      |
+| **Binary Sensor** | Yes 5 types       | No             | No              |
+| **Remote**        | Yes Navigation    | No             | No              |
+| **Button**        | Yes Multiple      | No             | Yes Scan clients |
+| **Notify**        | Yes On-screen     | No             | No              |
+| **Image**         | Yes Discovery art | No             | No              |
+| **Update**        | No               | No             | Yes              |
 
 ### Sensor Types Detail
 
 | Sensor Type       | embymedia | Official Emby | Official Plex         |
 | ----------------- | --------- | ------------- | --------------------- |
-| Active Sessions   | ✅        | ❌            | ✅ ("watching")       |
-| Movie Count       | ✅        | ❌            | ✅                    |
-| Series Count      | ✅        | ❌            | ✅ (as shows)         |
-| Episode Count     | ✅        | ❌            | ✅                    |
-| Song Count        | ✅        | ❌            | ❌                    |
-| Album Count       | ✅        | ❌            | ✅                    |
-| Artist Count      | ✅        | ❌            | ✅                    |
-| Collection Count  | ✅        | ❌            | ❌                    |
-| Playlist Count    | ✅        | ❌            | ❌                    |
-| Server Version    | ✅        | ❌            | ❌ (in Update entity) |
-| Running Tasks     | ✅        | ❌            | ❌                    |
-| Recording Count   | ✅        | ❌            | ❌                    |
-| Connected Devices | ✅        | ❌            | ❌                    |
-| Plugin Count      | ✅        | ❌            | ❌                    |
-| Watch Statistics  | ✅        | ❌            | ❌                    |
-| Last Added Title  | ❌        | ❌            | ✅                    |
+| Active Sessions   | Yes        | No            | Yes ("watching")       |
+| Movie Count       | Yes        | No            | Yes                    |
+| Series Count      | Yes        | No            | Yes (as shows)         |
+| Episode Count     | Yes        | No            | Yes                    |
+| Song Count        | Yes        | No            | No                    |
+| Album Count       | Yes        | No            | Yes                    |
+| Artist Count      | Yes        | No            | Yes                    |
+| Collection Count  | Yes        | No            | No                    |
+| Playlist Count    | Yes        | No            | No                    |
+| Server Version    | Yes        | No            | No (in Update entity) |
+| Running Tasks     | Yes        | No            | No                    |
+| Recording Count   | Yes        | No            | No                    |
+| Connected Devices | Yes        | No            | No                    |
+| Plugin Count      | Yes        | No            | No                    |
+| Watch Statistics  | Yes        | No            | No                    |
+| Last Added Title  | No        | No            | Yes                    |
 
 ### Binary Sensor Types
 
 | Binary Sensor       | embymedia | Official Emby | Official Plex    |
 | ------------------- | --------- | ------------- | ---------------- |
-| Server Connected    | ✅        | ❌            | ❌               |
-| Pending Restart     | ✅        | ❌            | ❌               |
-| Update Available    | ✅        | ❌            | ❌ (uses Update) |
-| Library Scan Active | ✅        | ❌            | ❌               |
-| Live TV Enabled     | ✅        | ❌            | N/A              |
+| Server Connected    | Yes        | No            | No               |
+| Pending Restart     | Yes        | No            | No               |
+| Update Available    | Yes        | No            | No (uses Update) |
+| Library Scan Active | Yes        | No            | No               |
+| Live TV Enabled     | Yes        | No            | N/A              |
 
 ---
 
@@ -113,52 +113,52 @@ This document provides a comprehensive comparison between this custom Emby Media
 
 | Feature        | embymedia | Official Emby | Official Plex |
 | -------------- | --------- | ------------- | ------------- |
-| Play           | ✅        | ✅            | ✅            |
-| Pause          | ✅        | ✅            | ✅            |
-| Stop           | ✅        | ✅            | ✅            |
-| Next Track     | ✅        | ✅            | ✅            |
-| Previous Track | ✅        | ✅            | ✅            |
-| Seek           | ✅        | ✅            | ✅            |
-| Volume Set     | ✅        | ❌            | ✅            |
-| Volume Mute    | ✅        | ❌            | ⚠️ Simulated  |
-| Shuffle Set    | ✅        | ❌            | ❌            |
-| Repeat Set     | ✅        | ❌            | ❌            |
+| Play           | Yes        | Yes            | Yes            |
+| Pause          | Yes        | Yes            | Yes            |
+| Stop           | Yes        | Yes            | Yes            |
+| Next Track     | Yes        | Yes            | Yes            |
+| Previous Track | Yes        | Yes            | Yes            |
+| Seek           | Yes        | Yes            | Yes            |
+| Volume Set     | Yes        | No            | Yes            |
+| Volume Mute    | Yes        | No            | Partial (Simulated)  |
+| Shuffle Set    | Yes        | No            | No            |
+| Repeat Set     | Yes        | No            | No            |
 
 ### Media Selection
 
 | Feature        | embymedia       | Official Emby | Official Plex |
 | -------------- | --------------- | ------------- | ------------- |
-| Play Media     | ✅              | ❌            | ✅            |
-| Browse Media   | ✅              | ❌            | ✅            |
-| Search Media   | ✅ Voice Assist | ❌            | ❌            |
-| Media Enqueue  | ✅              | ❌            | ❌            |
-| Clear Playlist | ✅              | ❌            | ❌            |
+| Play Media     | Yes              | No            | Yes            |
+| Browse Media   | Yes              | No            | Yes            |
+| Search Media   | Yes Voice Assist | No            | No            |
+| Media Enqueue  | Yes              | No            | No            |
+| Clear Playlist | Yes              | No            | No            |
 
 ### Media Information
 
 | Property              | embymedia | Official Emby | Official Plex |
 | --------------------- | --------- | ------------- | ------------- |
-| Title                 | ✅        | ✅            | ✅            |
-| Duration              | ✅        | ✅            | ✅            |
-| Position              | ✅        | ✅            | ✅            |
-| Artwork               | ✅        | ✅            | ✅            |
-| Series/Season/Episode | ✅        | ✅            | ✅            |
-| Album/Artist          | ✅        | ✅            | ✅            |
-| Content ID            | ✅        | ✅            | ✅            |
-| User/App Name         | ✅        | ✅            | ✅            |
+| Title                 | Yes        | Yes            | Yes            |
+| Duration              | Yes        | Yes            | Yes            |
+| Position              | Yes        | Yes            | Yes            |
+| Artwork               | Yes        | Yes            | Yes            |
+| Series/Season/Episode | Yes        | Yes            | Yes            |
+| Album/Artist          | Yes        | Yes            | Yes            |
+| Content ID            | Yes        | Yes            | Yes            |
+| User/App Name         | Yes        | Yes            | Yes            |
 
 ### Supported Media Types
 
 | Media Type   | embymedia | Official Emby | Official Plex |
 | ------------ | --------- | ------------- | ------------- |
-| Movies       | ✅        | ✅            | ✅            |
-| TV Episodes  | ✅        | ✅            | ✅            |
-| Music Tracks | ✅        | ✅            | ✅            |
-| Music Videos | ✅        | ✅            | ❌            |
-| Photos       | ✅        | ❌            | ✅            |
-| Live TV      | ✅        | ✅            | N/A           |
-| Trailers     | ✅        | ✅            | ✅ (clips)    |
-| Playlists    | ✅        | ❌            | ✅            |
+| Movies       | Yes        | Yes            | Yes            |
+| TV Episodes  | Yes        | Yes            | Yes            |
+| Music Tracks | Yes        | Yes            | Yes            |
+| Music Videos | Yes        | Yes            | No            |
+| Photos       | Yes        | No            | Yes            |
+| Live TV      | Yes        | Yes            | N/A           |
+| Trailers     | Yes        | Yes            | Yes (clips)    |
+| Playlists    | Yes        | No            | Yes            |
 
 ---
 
@@ -168,43 +168,43 @@ This document provides a comprehensive comparison between this custom Emby Media
 
 | Service          | embymedia | Official Emby | Official Plex |
 | ---------------- | --------- | ------------- | ------------- |
-| Send Message     | ✅        | ❌            | ❌            |
-| Send Command     | ✅        | ❌            | ❌            |
-| Mark Played      | ✅        | ❌            | ❌            |
-| Mark Unplayed    | ✅        | ❌            | ❌            |
-| Add Favorite     | ✅        | ❌            | ❌            |
-| Remove Favorite  | ✅        | ❌            | ❌            |
-| Play Instant Mix | ✅        | ❌            | ❌            |
-| Play Similar     | ✅        | ❌            | ❌            |
-| Clear Queue      | ✅        | ❌            | ❌            |
+| Send Message     | Yes        | No            | No            |
+| Send Command     | Yes        | No            | No            |
+| Mark Played      | Yes        | No            | No            |
+| Mark Unplayed    | Yes        | No            | No            |
+| Add Favorite     | Yes        | No            | No            |
+| Remove Favorite  | Yes        | No            | No            |
+| Play Instant Mix | Yes        | No            | No            |
+| Play Similar     | Yes        | No            | No            |
+| Clear Queue      | Yes        | No            | No            |
 
 ### Library Services
 
 | Service                | embymedia | Official Emby | Official Plex |
 | ---------------------- | --------- | ------------- | ------------- |
-| Refresh Library        | ✅        | ❌            | ✅            |
-| Create Playlist        | ✅        | ❌            | ❌            |
-| Add to Playlist        | ✅        | ❌            | ❌            |
-| Remove from Playlist   | ✅        | ❌            | ❌            |
-| Create Collection      | ✅        | ❌            | ❌            |
-| Add to Collection      | ✅        | ❌            | ❌            |
-| Remove from Collection | ✅        | ❌            | ❌            |
+| Refresh Library        | Yes        | No            | Yes            |
+| Create Playlist        | Yes        | No            | No            |
+| Add to Playlist        | Yes        | No            | No            |
+| Remove from Playlist   | Yes        | No            | No            |
+| Create Collection      | Yes        | No            | No            |
+| Add to Collection      | Yes        | No            | No            |
+| Remove from Collection | Yes        | No            | No            |
 
 ### Live TV Services
 
 | Service             | embymedia | Official Emby | Official Plex |
 | ------------------- | --------- | ------------- | ------------- |
-| Schedule Recording  | ✅        | ❌            | N/A           |
-| Cancel Recording    | ✅        | ❌            | N/A           |
-| Cancel Series Timer | ✅        | ❌            | N/A           |
+| Schedule Recording  | Yes        | No            | N/A           |
+| Cancel Recording    | Yes        | No            | N/A           |
+| Cancel Series Timer | Yes        | No            | N/A           |
 
 ### Server Administration
 
 | Service            | embymedia | Official Emby | Official Plex |
 | ------------------ | --------- | ------------- | ------------- |
-| Run Scheduled Task | ✅        | ❌            | ❌            |
-| Restart Server     | ✅        | ❌            | ❌            |
-| Shutdown Server    | ✅        | ❌            | ❌            |
+| Run Scheduled Task | Yes        | No            | No            |
+| Restart Server     | Yes        | No            | No            |
+| Shutdown Server    | Yes        | No            | No            |
 
 ---
 
@@ -212,13 +212,13 @@ This document provides a comprehensive comparison between this custom Emby Media
 
 | Feature               | embymedia              | Official Emby | Official Plex |
 | --------------------- | ---------------------- | ------------- | ------------- |
-| WebSocket Support     | ✅ Full                | ❌            | ✅ Limited    |
-| Session Updates       | ✅ Real-time           | Polling       | ✅ Real-time  |
-| Library Changes       | ✅ Real-time           | ❌            | ✅ Signals    |
-| User Data Changes     | ✅ Real-time           | ❌            | ❌            |
-| Auto-Reconnection     | ✅ Exponential backoff | N/A           | ✅            |
-| Adaptive Polling      | ✅ WS-aware            | ❌            | ❌            |
-| Configurable Interval | ✅ 500-10000ms         | ❌            | ❌            |
+| WebSocket Support     | Yes Full                | No            | Yes Limited    |
+| Session Updates       | Yes Real-time           | Polling       | Yes Real-time  |
+| Library Changes       | Yes Real-time           | No            | Yes Signals    |
+| User Data Changes     | Yes Real-time           | No            | No            |
+| Auto-Reconnection     | Yes Exponential backoff | N/A           | Yes            |
+| Adaptive Polling      | Yes WS-aware            | No            | No            |
+| Configurable Interval | Yes 500-10000ms         | No            | No            |
 
 ---
 
@@ -226,15 +226,15 @@ This document provides a comprehensive comparison between this custom Emby Media
 
 | Feature                 | embymedia | Official Emby | Official Plex |
 | ----------------------- | --------- | ------------- | ------------- |
-| Browse Media Support    | ✅        | ❌            | ✅            |
-| Hierarchical Navigation | ✅        | ❌            | ✅            |
-| Libraries               | ✅        | ❌            | ✅            |
-| Genres                  | ✅        | ❌            | ❌            |
-| Artists/Albums          | ✅        | ❌            | ✅            |
-| Series/Seasons          | ✅        | ❌            | ✅            |
-| Playlists               | ✅        | ❌            | ✅            |
-| Collections/BoxSets     | ✅        | ❌            | ❌            |
-| Recommendations         | ✅        | ❌            | ✅ (Hubs)     |
+| Browse Media Support    | Yes        | No            | Yes            |
+| Hierarchical Navigation | Yes        | No            | Yes            |
+| Libraries               | Yes        | No            | Yes            |
+| Genres                  | Yes        | No            | No            |
+| Artists/Albums          | Yes        | No            | Yes            |
+| Series/Seasons          | Yes        | No            | Yes            |
+| Playlists               | Yes        | No            | Yes            |
+| Collections/BoxSets     | Yes        | No            | No            |
+| Recommendations         | Yes        | No            | Yes (Hubs)     |
 
 ---
 
@@ -242,10 +242,10 @@ This document provides a comprehensive comparison between this custom Emby Media
 
 | Feature                 | embymedia | Official Emby | Official Plex |
 | ----------------------- | --------- | ------------- | ------------- |
-| HA Assist Support       | ✅        | ❌            | ❌            |
-| search_media Method     | ✅        | ❌            | ❌            |
-| Natural Language Search | ✅        | ❌            | ❌            |
-| Play by Voice           | ✅        | ❌            | ❌            |
+| HA Assist Support       | Yes        | No            | No            |
+| search_media Method     | Yes        | No            | No            |
+| Natural Language Search | Yes        | No            | No            |
+| Play by Voice           | Yes        | No            | No            |
 
 ---
 
@@ -253,20 +253,20 @@ This document provides a comprehensive comparison between this custom Emby Media
 
 | Feature                | embymedia  | Official Emby | Official Plex |
 | ---------------------- | ---------- | ------------- | ------------- |
-| **Device Triggers**    | ✅ 7 types | ❌            | ❌            |
-| - playback_started     | ✅         | ❌            | ❌            |
-| - playback_stopped     | ✅         | ❌            | ❌            |
-| - playback_paused      | ✅         | ❌            | ❌            |
-| - playback_resumed     | ✅         | ❌            | ❌            |
-| - media_changed        | ✅         | ❌            | ❌            |
-| - session_connected    | ✅         | ❌            | ❌            |
-| - session_disconnected | ✅         | ❌            | ❌            |
-| **Device Conditions**  | ✅ 5 types | ❌            | ❌            |
-| - is_playing           | ✅         | ❌            | ❌            |
-| - is_paused            | ✅         | ❌            | ❌            |
-| - is_idle              | ✅         | ❌            | ❌            |
-| - is_off               | ✅         | ❌            | ❌            |
-| - has_media            | ✅         | ❌            | ❌            |
+| **Device Triggers**    | Yes 7 types | No            | No            |
+| - playback_started     | Yes         | No            | No            |
+| - playback_stopped     | Yes         | No            | No            |
+| - playback_paused      | Yes         | No            | No            |
+| - playback_resumed     | Yes         | No            | No            |
+| - media_changed        | Yes         | No            | No            |
+| - session_connected    | Yes         | No            | No            |
+| - session_disconnected | Yes         | No            | No            |
+| **Device Conditions**  | Yes 5 types | No            | No            |
+| - is_playing           | Yes         | No            | No            |
+| - is_paused            | Yes         | No            | No            |
+| - is_idle              | Yes         | No            | No            |
+| - is_off               | Yes         | No            | No            |
+| - has_media            | Yes         | No            | No            |
 
 ---
 
@@ -274,16 +274,16 @@ This document provides a comprehensive comparison between this custom Emby Media
 
 | Command                         | embymedia | Official Emby | Official Plex |
 | ------------------------------- | --------- | ------------- | ------------- |
-| Navigation (Up/Down/Left/Right) | ✅        | ❌            | ❌            |
-| Page Up/Down                    | ✅        | ❌            | ❌            |
-| Select/Back                     | ✅        | ❌            | ❌            |
-| Home/Settings                   | ✅        | ❌            | ❌            |
-| Context Menu                    | ✅        | ❌            | ❌            |
-| OSD Menu                        | ✅        | ❌            | ❌            |
-| Volume Keys                     | ✅        | ❌            | ❌            |
-| Audio/Subtitle Index            | ✅        | ❌            | ❌            |
-| Send String                     | ✅        | ❌            | ❌            |
-| Screenshot                      | ✅        | ❌            | ❌            |
+| Navigation (Up/Down/Left/Right) | Yes        | No            | No            |
+| Page Up/Down                    | Yes        | No            | No            |
+| Select/Back                     | Yes        | No            | No            |
+| Home/Settings                   | Yes        | No            | No            |
+| Context Menu                    | Yes        | No            | No            |
+| OSD Menu                        | Yes        | No            | No            |
+| Volume Keys                     | Yes        | No            | No            |
+| Audio/Subtitle Index            | Yes        | No            | No            |
+| Send String                     | Yes        | No            | No            |
+| Screenshot                      | Yes        | No            | No            |
 
 ---
 
@@ -291,11 +291,11 @@ This document provides a comprehensive comparison between this custom Emby Media
 
 | Feature            | embymedia         | Official Emby | Official Plex  |
 | ------------------ | ----------------- | ------------- | -------------- |
-| Next Up Episodes   | ✅ Sensor + Image | ❌            | ❌             |
-| Continue Watching  | ✅ Sensor + Image | ❌            | ❌             |
-| Recently Added     | ✅ Sensor + Image | ❌            | ✅ (attribute) |
-| Suggestions        | ✅ Sensor + Image | ❌            | ❌             |
-| Per-User Discovery | ✅                | ❌            | ❌             |
+| Next Up Episodes   | Yes Sensor + Image | No            | No             |
+| Continue Watching  | Yes Sensor + Image | No            | No             |
+| Recently Added     | Yes Sensor + Image | No            | Yes (attribute) |
+| Suggestions        | Yes Sensor + Image | No            | No             |
+| Per-User Discovery | Yes                | No            | No             |
 
 ---
 
@@ -303,17 +303,17 @@ This document provides a comprehensive comparison between this custom Emby Media
 
 | Feature                  | embymedia        | Official Emby | Official Plex |
 | ------------------------ | ---------------- | ------------- | ------------- |
-| Direct Play Preference   | ✅ Configurable  | N/A           | N/A           |
-| Transcode Profiles       | ✅ 5 presets     | ❌            | ❌            |
-| - Universal              | ✅               | ❌            | ❌            |
-| - Chromecast             | ✅               | ❌            | ❌            |
-| - Roku                   | ✅               | ❌            | ❌            |
-| - Apple TV               | ✅               | ❌            | ❌            |
-| - Audio Only             | ✅               | ❌            | ❌            |
-| Max Bitrate Config       | ✅ Video + Audio | ❌            | ❌            |
-| Container Selection      | ✅ mp4/mkv/webm  | ❌            | ❌            |
-| HLS Streaming            | ✅               | ❌            | ❌            |
-| PlaybackInfo Negotiation | ✅               | ❌            | ❌            |
+| Direct Play Preference   | Yes Configurable  | N/A           | N/A           |
+| Transcode Profiles       | Yes 5 presets     | No            | No            |
+| - Universal              | Yes               | No            | No            |
+| - Chromecast             | Yes               | No            | No            |
+| - Roku                   | Yes               | No            | No            |
+| - Apple TV               | Yes               | No            | No            |
+| - Audio Only             | Yes               | No            | No            |
+| Max Bitrate Config       | Yes Video + Audio | No            | No            |
+| Container Selection      | Yes mp4/mkv/webm  | No            | No            |
+| HLS Streaming            | Yes               | No            | No            |
+| PlaybackInfo Negotiation | Yes               | No            | No            |
 
 ---
 
@@ -321,11 +321,11 @@ This document provides a comprehensive comparison between this custom Emby Media
 
 | Feature                  | embymedia | Official Emby | Official Plex |
 | ------------------------ | --------- | ------------- | ------------- |
-| Live TV Channel Browse   | ✅        | ⚠️ Basic      | N/A           |
-| Recording Management     | ✅        | ❌            | N/A           |
-| Series Timers            | ✅        | ❌            | N/A           |
-| Active Recordings Sensor | ✅        | ❌            | N/A           |
-| Scheduled Timers Sensor  | ✅        | ❌            | N/A           |
+| Live TV Channel Browse   | Yes        | Partial (Basic)      | N/A           |
+| Recording Management     | Yes        | No            | N/A           |
+| Series Timers            | Yes        | No            | N/A           |
+| Active Recordings Sensor | Yes        | No            | N/A           |
+| Scheduled Timers Sensor  | Yes        | No            | N/A           |
 
 ---
 
@@ -336,11 +336,11 @@ This document provides a comprehensive comparison between this custom Emby Media
 | Quality Scale         | Modern             | Legacy           | Modern        |
 | IoT Class             | local_push         | local_push       | local_push    |
 | Integration Type      | Hub                | Platform         | Service       |
-| Coordinators          | ✅ Multi (4 types) | ❌               | ⚠️ Limited    |
-| Request Coalescing    | ✅                 | ❌               | ❌            |
-| Browse Caching        | ✅                 | ❌               | ❌            |
-| Diagnostics Export    | ✅                 | ❌               | ❌            |
-| Device ID Persistence | ✅                 | ⚠️ Session-based | ✅            |
+| Coordinators          | Yes Multi (4 types) | No               | Partial (Limited)    |
+| Request Coalescing    | Yes                 | No               | No            |
+| Browse Caching        | Yes                 | No               | No            |
+| Diagnostics Export    | Yes                 | No               | No            |
+| Device ID Persistence | Yes                 | Partial (Session-based) | Yes            |
 
 ### Coordinator Types (embymedia)
 
@@ -357,9 +357,9 @@ This document provides a comprehensive comparison between this custom Emby Media
 
 | Feature       | embymedia       | Official Emby | Official Plex |
 | ------------- | --------------- | ------------- | ------------- |
-| Sonos Support | ❌              | ❌            | ✅ Direct     |
-| Cast Support  | ⚠️ Via profiles | ❌            | ✅            |
-| Media Source  | ✅              | ❌            | ✅            |
+| Sonos Support | No              | No            | Yes Direct     |
+| Cast Support  | Partial (Via profiles) | No            | Yes            |
+| Media Source  | Yes              | No            | Yes            |
 
 ---
 
@@ -367,12 +367,12 @@ This document provides a comprehensive comparison between this custom Emby Media
 
 | Feature               | embymedia          | Official Emby | Official Plex  |
 | --------------------- | ------------------ | ------------- | -------------- |
-| Connection Recovery   | ✅ Auto-reconnect  | Basic         | ✅             |
-| Auth Error Handling   | ✅ Reauth flow     | ❌            | ✅ Reauth flow |
-| SSL Error Handling    | ✅ Configurable    | Basic         | ✅             |
-| Timeout Configuration | ✅                 | ❌            | ❌             |
-| Health Checks         | ✅ 5-min intervals | ❌            | ❌             |
-| Stale Session Cleanup | ✅                 | ❌            | ❌             |
+| Connection Recovery   | Yes Auto-reconnect  | Basic         | Yes             |
+| Auth Error Handling   | Yes Reauth flow     | No            | Yes Reauth flow |
+| SSL Error Handling    | Yes Configurable    | Basic         | Yes             |
+| Timeout Configuration | Yes                 | No            | No             |
+| Health Checks         | Yes 5-min intervals | No            | No             |
+| Stale Session Cleanup | Yes                 | No            | No             |
 
 ---
 

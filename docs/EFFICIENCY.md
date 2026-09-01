@@ -326,4 +326,4 @@ If `entries` approaches 500, consider:
 
 - **[Configuration](CONFIGURATION.md)** - Detailed configuration options
 - **[Troubleshooting](TROUBLESHOOTING.md)** - General problem solving
-- **[CLAUDE.md](../CLAUDE.md)** - Development guidelines
+- **[Architecture](ARCHITECTURE.md)** - How the integration is put together

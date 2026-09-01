@@ -73,8 +73,8 @@ if TYPE_CHECKING:
 
 _LOGGER = logging.getLogger(__name__)
 
-# Version for User-Agent header
-__version__ = "0.5.1"
+# Version for User-Agent header. Keep in step with manifest.json.
+__version__ = "0.7.3"
 
 # Upper bound for the last-resort year scan, used only when neither /Years nor
 # /Items/Filters is available. Each item costs bandwidth for a single field.

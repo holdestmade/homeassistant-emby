@@ -9,6 +9,7 @@ This guide helps you resolve common issues with the Emby Media integration.
 - [Entity Issues](#entity-issues)
 - [Playback Issues](#playback-issues)
 - [WebSocket Issues](#websocket-issues)
+- [Artwork Issues](#artwork-issues)
 - [Media Browsing Issues](#media-browsing-issues)
 - [Performance Issues](#performance-issues)
 - [Getting Diagnostics](#getting-diagnostics)
@@ -181,6 +182,19 @@ This guide helps you resolve common issues with the Emby Media integration.
    - May occur if device ID changes
    - Delete old entities from Entity Registry
 
+3. **Entity ID repeats the device name:**
+   - Entities created before version 0.7.1 could be registered as
+     `media_player.living_room_living_room`, with the device name twice
+   - New entities no longer do this. Existing ones keep their IDs so that
+     automations and dashboards keep working
+   - To adopt the shorter ID, rename the entity in its settings
+
+4. **The "Emby" prefix is a single setting:**
+   - One device backs the media player, remote and notify entities for a
+     client, so the prefix applies to all of them together
+   - Settings -> Devices & Services -> Emby Media -> Configure ->
+     "Prefix Emby device names with 'Emby'"
+
 ---
 
 ## Playback Issues
@@ -285,6 +299,42 @@ This guide helps you resolve common issues with the Emby Media integration.
 4. **Check reconnection:**
    - Integration automatically reconnects with exponential backoff
    - Check logs for reconnection attempts
+
+---
+
+## Artwork Issues
+
+### Artwork Broken After Updating
+
+**Symptoms:**
+- Cover art that used to load now shows as a broken image
+- A dashboard card pointing at `/api/embymedia/image/...` returns 401
+
+**Cause:**
+
+The image proxy fetches artwork from Emby using your API key. It used to
+accept any request, so anyone who could reach Home Assistant could pull
+artwork without signing in, and the API key was embedded in the image URLs
+published in entity attributes.
+
+From version 0.7.1 the proxy requires authentication, and the integration
+hands out short-lived signed URLs instead. Artwork keeps working
+everywhere the integration supplies the URL: the media browser, the media
+player artwork, and the discovery sensor attributes.
+
+**Solutions:**
+
+1. **Use the attribute, not a copied URL:**
+   - A URL copied out of an attribute and pasted into a card stops working
+     when its signature expires
+   - Read it live instead:
+     `{{ state_attr('sensor.emby_next_up', 'items')[0].image_url }}`
+
+2. **Rotate your Emby API key:**
+   - Earlier versions published the key inside image URLs, which were
+     stored in the recorder database and served to any Home Assistant user
+   - Generate a new key in Emby Dashboard -> Advanced -> API Keys, then
+     update the integration through Configure
 
 ---
 
@@ -458,21 +508,9 @@ Restart Home Assistant and reproduce the issue.
 
 ### Before Opening an Issue
 
-1. **Search existing issues**: [GitHub Issues](https://github.com/troykelly/homeassistant-emby/issues)
-2. **Check discussions**: [GitHub Discussions](https://github.com/troykelly/homeassistant-emby/discussions)
+1. **Search existing issues**: [GitHub Issues](https://github.com/holdestmade/homeassistant-emby/issues)
+2. **Check discussions**: [GitHub Discussions](https://github.com/holdestmade/homeassistant-emby/discussions)
 3. **Review this troubleshooting guide**
-
-### Choose the Right Template
-
-When opening an issue, use the appropriate template:
-
-| Issue Type | Template | Use When |
-|------------|----------|----------|
-| **[Bug Report](https://github.com/troykelly/homeassistant-emby/issues/new?template=1_bug_report.yml)** | Something isn't working | Features broke or behave unexpectedly |
-| **[Feature Request](https://github.com/troykelly/homeassistant-emby/issues/new?template=2_feature_request.yml)** | New functionality | Suggesting improvements or new features |
-| **[Connection Issue](https://github.com/troykelly/homeassistant-emby/issues/new?template=3_connection_issue.yml)** | Can't connect | Setup problems, authentication, network issues |
-| **[Help/Question](https://github.com/troykelly/homeassistant-emby/issues/new?template=4_help_question.yml)** | Need assistance | How-to questions, clarifications |
-| **[Compatibility](https://github.com/troykelly/homeassistant-emby/issues/new?template=5_compatibility_issue.yml)** | Broke after update | HA updates, HACS issues, conflicts |
 
 ### Required Information
 
@@ -503,7 +541,7 @@ logger:
     custom_components.embymedia: debug
 ```
 
-Open issues at: https://github.com/troykelly/homeassistant-emby/issues/new/choose
+Open issues at: https://github.com/holdestmade/homeassistant-emby/issues/new/choose
 
 ---
 
@@ -524,6 +562,6 @@ Open issues at: https://github.com/troykelly/homeassistant-emby/issues/new/choos
 
 If this guide didn't solve your problem:
 
-1. Search [existing issues](https://github.com/troykelly/homeassistant-emby/issues)
+1. Search [existing issues](https://github.com/holdestmade/homeassistant-emby/issues)
 2. Check [Home Assistant Community](https://community.home-assistant.io/)
-3. [Open a new issue](https://github.com/troykelly/homeassistant-emby/issues/new) with full details
+3. [Open a new issue](https://github.com/holdestmade/homeassistant-emby/issues/new) with full details
