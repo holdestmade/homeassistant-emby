@@ -238,6 +238,33 @@ class TestSetupEntry:
             assert mock_config_entry.state is ConfigEntryState.SETUP_RETRY
 
     @pytest.mark.asyncio
+    async def test_setup_entry_server_error_retries(
+        self,
+        hass: HomeAssistant,
+        mock_config_entry: MockConfigEntry,
+    ) -> None:
+        """Test setup retries on transient server errors (HTTP 5xx).
+
+        An Emby server that is itself still starting up (e.g. after a host
+        reboot) can return 5xx responses. These must result in SETUP_RETRY,
+        not a permanent SETUP_ERROR.
+        """
+        from custom_components.embymedia.exceptions import EmbyServerError
+
+        mock_config_entry.add_to_hass(hass)
+
+        with patch("custom_components.embymedia.EmbyClient", autospec=True) as mock_client_class:
+            client = mock_client_class.return_value
+            client.async_validate_connection = AsyncMock(
+                side_effect=EmbyServerError("Server error: 503 Service Unavailable")
+            )
+
+            result = await hass.config_entries.async_setup(mock_config_entry.entry_id)
+
+            assert result is False
+            assert mock_config_entry.state is ConfigEntryState.SETUP_RETRY
+
+    @pytest.mark.asyncio
     async def test_setup_entry_auth_failure(
         self,
         hass: HomeAssistant,

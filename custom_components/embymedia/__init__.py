@@ -20,6 +20,7 @@ YAML Configuration Example:
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from typing import TYPE_CHECKING, Final
 
@@ -71,7 +72,6 @@ from .coordinator_discovery import EmbyDiscoveryCoordinator
 from .coordinator_sensors import EmbyLibraryCoordinator, EmbyServerCoordinator
 from .exceptions import (
     EmbyAuthenticationError,
-    EmbyConnectionError,
     EmbyError,
     EmbyWebSocketError,
 )
@@ -191,7 +191,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: EmbyConfigEntry) -> bool
         raise ConfigEntryAuthFailed(
             f"Invalid API key for Emby server at {entry.data[CONF_HOST]}"
         ) from err
-    except EmbyConnectionError as err:
+    except EmbyError as err:
+        # Covers connection errors, timeouts, and transient server errors
+        # (e.g. HTTP 5xx while the Emby server itself is still starting up).
+        # ConfigEntryNotReady makes HA retry setup in the background instead
+        # of failing permanently.
         raise ConfigEntryNotReady(
             f"Unable to connect to Emby server at {entry.data[CONF_HOST]}: {err}"
         ) from err
@@ -280,12 +284,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: EmbyConfigEntry) -> bool
                     err,
                 )
 
-    # Fetch initial data from all coordinators
-    await session_coordinator.async_config_entry_first_refresh()
-    await server_coordinator.async_config_entry_first_refresh()
-    await library_coordinator.async_config_entry_first_refresh()
-    for coordinator in discovery_coordinators.values():
-        await coordinator.async_config_entry_first_refresh()
+    # Fetch initial data from all coordinators concurrently.
+    # Running these serially (especially one discovery refresh per Emby user)
+    # multiplies setup time and delays HA startup on slow servers.
+    await asyncio.gather(
+        session_coordinator.async_config_entry_first_refresh(),
+        server_coordinator.async_config_entry_first_refresh(),
+        library_coordinator.async_config_entry_first_refresh(),
+        *(
+            coordinator.async_config_entry_first_refresh()
+            for coordinator in discovery_coordinators.values()
+        ),
+    )
 
     # Store runtime data with all coordinators
     entry.runtime_data = EmbyRuntimeData(

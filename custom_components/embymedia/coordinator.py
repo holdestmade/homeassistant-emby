@@ -57,6 +57,11 @@ DEFAULT_STALE_SESSION_MAX_AGE = 3600
 # WebSocket stability tracking - disable polling after N consecutive successful messages
 WEBSOCKET_STABLE_THRESHOLD = 5
 
+# Delay before attempting a WebSocket reconnect after the connection drops.
+# Prevents a tight reconnect spin when the server accepts and immediately
+# closes connections (e.g. while restarting).
+WEBSOCKET_RECONNECT_DELAY = 5
+
 # Health check interval when polling is disabled (5 minutes)
 HEALTH_CHECK_INTERVAL = 300
 
@@ -120,6 +125,7 @@ class EmbyDataUpdateCoordinator(DataUpdateCoordinator[dict[str, EmbySession]]):
         self._websocket: EmbyWebSocket | None = None
         self._websocket_enabled: bool = False
         self._websocket_receive_task: asyncio.Task[None] | None = None
+        self._websocket_reconnect_task: asyncio.Task[None] | None = None
         self._configured_scan_interval = scan_interval
         # Resilience tracking
         self._consecutive_failures: int = 0
@@ -287,7 +293,13 @@ class EmbyDataUpdateCoordinator(DataUpdateCoordinator[dict[str, EmbySession]]):
                 if self._polling_disabled:
                     await self.async_health_check()
 
-        self._health_check_task = self.hass.async_create_task(_health_check_loop())
+        # Must be a background task: HA bootstrap waits for all tracked tasks
+        # created via async_create_task, so a long-lived loop would block
+        # startup until the bootstrap timeout (issue: HA restart hangs 10+ min)
+        self._health_check_task = self.hass.async_create_background_task(
+            _health_check_loop(),
+            name=f"{DOMAIN}_{self.server_id}_health_check",
+        )
 
     async def async_health_check(self) -> None:
         """Perform a lightweight health check.
@@ -602,9 +614,11 @@ class EmbyDataUpdateCoordinator(DataUpdateCoordinator[dict[str, EmbySession]]):
             self._consecutive_failures,
         )
 
-        # Try to reconnect WebSocket by starting reconnect loop
+        # Try to reconnect WebSocket in the background. Never await the
+        # reconnect loop here: it backs off for up to minutes and would
+        # block the coordinator update path.
         if self._websocket is not None:
-            await self._websocket.async_start_reconnect_loop()
+            self._schedule_websocket_reconnect()
 
         # Refresh server info to verify connectivity
         try:
@@ -673,9 +687,13 @@ class EmbyDataUpdateCoordinator(DataUpdateCoordinator[dict[str, EmbySession]]):
             _LOGGER.info("WebSocket connected to Emby server %s", self.server_name)
             # Notify library coordinator to extend its polling interval (#289)
             self._update_library_coordinator_websocket_status(True)
-            # Start receive loop in background and store task for cleanup
-            self._websocket_receive_task = self.hass.async_create_task(
-                self._async_websocket_receive_loop()
+            # Start receive loop in background and store task for cleanup.
+            # Must be a background task: HA bootstrap waits for all tracked
+            # tasks created via async_create_task, so this long-lived loop
+            # would block startup until the bootstrap timeout.
+            self._websocket_receive_task = self.hass.async_create_background_task(
+                self._async_websocket_receive_loop(),
+                name=f"{DOMAIN}_{self.server_id}_websocket_receive",
             )
         except aiohttp.ClientError as err:
             _LOGGER.warning(
@@ -692,20 +710,85 @@ class EmbyDataUpdateCoordinator(DataUpdateCoordinator[dict[str, EmbySession]]):
         try:
             await self._websocket.async_run_receive_loop()
         except asyncio.CancelledError:
+            # Shutdown path: do not fall back to polling or reconnect
             _LOGGER.debug("WebSocket receive loop cancelled")
             raise
         except aiohttp.ClientError as err:
             _LOGGER.warning("WebSocket client error: %s", err)
         except OSError as err:
             _LOGGER.warning("WebSocket OS error: %s", err)
-        finally:
-            # Connection lost, trigger reconnect or fallback
-            if self._websocket_enabled:
-                self._handle_websocket_connection(False)
+
+        # Connection lost, fall back to polling and schedule a reconnect
+        if self._websocket_enabled:
+            self._handle_websocket_connection(False)
+            self._schedule_websocket_reconnect()
+
+    def _schedule_websocket_reconnect(self) -> None:
+        """Schedule a background task to re-establish the WebSocket.
+
+        Reconnects with exponential backoff, re-subscribes to session
+        updates, and restarts the receive loop. Polling continues as a
+        fallback until the WebSocket is healthy again.
+        """
+        if self.hass.is_stopping:
+            return
+        if self._websocket_reconnect_task is not None and not self._websocket_reconnect_task.done():
+            return
+        self._websocket_reconnect_task = self.hass.async_create_background_task(
+            self._async_websocket_reconnect(),
+            name=f"{DOMAIN}_{self.server_id}_websocket_reconnect",
+        )
+
+    async def _async_websocket_reconnect(self) -> None:
+        """Reconnect the WebSocket, re-subscribe, and restart the receive loop."""
+        websocket = self._websocket
+        if websocket is None:
+            return
+
+        # Delay before reconnecting so a server that accepts and instantly
+        # drops connections cannot drive a tight reconnect loop
+        await asyncio.sleep(WEBSOCKET_RECONNECT_DELAY)
+
+        await websocket.async_start_reconnect_loop()
+        if not websocket.connected:
+            # Reconnect loop was stopped (shutdown) before connecting
+            return
+
+        interval_ms = self.config_entry.options.get(
+            CONF_WEBSOCKET_INTERVAL, DEFAULT_WEBSOCKET_INTERVAL
+        )
+        try:
+            await websocket.async_subscribe_sessions(interval_ms=interval_ms)
+        except (RuntimeError, aiohttp.ClientError, OSError) as err:
+            _LOGGER.warning(
+                "Reconnected WebSocket to %s but failed to re-subscribe: %s. "
+                "Continuing with polling.",
+                self.server_name,
+                err,
+            )
+            return
+
+        _LOGGER.info("WebSocket reconnected to Emby server %s", self.server_name)
+        self._handle_websocket_connection(True)
+        self._websocket_receive_task = self.hass.async_create_background_task(
+            self._async_websocket_receive_loop(),
+            name=f"{DOMAIN}_{self.server_id}_websocket_receive",
+        )
 
     async def async_shutdown_websocket(self) -> None:
         """Shut down WebSocket connection."""
-        # Cancel the receive loop task first
+        # Mark disabled first so the receive loop's cleanup does not
+        # schedule a reconnect while we are shutting down
+        self._websocket_enabled = False
+
+        # Cancel the reconnect task if one is pending
+        if self._websocket_reconnect_task is not None:
+            self._websocket_reconnect_task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await self._websocket_reconnect_task
+            self._websocket_reconnect_task = None
+
+        # Cancel the receive loop task
         if self._websocket_receive_task is not None:
             self._websocket_receive_task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
@@ -1065,7 +1148,12 @@ class EmbyDataUpdateCoordinator(DataUpdateCoordinator[dict[str, EmbySession]]):
                 await asyncio.sleep(5)
                 await library_coordinator.async_request_refresh()
 
-            self.hass.async_create_task(_delayed_refresh())
+            # Background task so the debounce delay never holds up HA
+            # startup/shutdown task tracking
+            self.hass.async_create_background_task(
+                _delayed_refresh(),
+                name=f"{DOMAIN}_{self.server_id}_library_refresh_debounce",
+            )
 
         # Invalidate discovery cache for all users (library content affects discovery)
         self._invalidate_all_discovery_caches()

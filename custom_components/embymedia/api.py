@@ -316,6 +316,7 @@ class EmbyClient:
                 url,
                 headers=headers,
                 ssl=ssl_context,
+                timeout=self._timeout,
             ) as response:
                 _LOGGER.debug(
                     "Emby API response: %s %s for %s %s",
@@ -587,6 +588,7 @@ class EmbyClient:
                 headers=headers,
                 json=data,
                 ssl=ssl_context,
+                timeout=self._timeout,
             ) as response:
                 _LOGGER.debug(
                     "Emby API response: %s %s for POST %s",
@@ -669,6 +671,7 @@ class EmbyClient:
                 headers=headers,
                 json=data,
                 ssl=ssl_context,
+                timeout=self._timeout,
             ) as response:
                 _LOGGER.debug(
                     "Emby API response: %s %s for POST %s",
@@ -745,6 +748,7 @@ class EmbyClient:
                 url,
                 headers=headers,
                 ssl=ssl_context,
+                timeout=self._timeout,
             ) as response:
                 _LOGGER.debug(
                     "Emby API response: %s %s for DELETE %s",

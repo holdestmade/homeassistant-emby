@@ -5,7 +5,7 @@ from __future__ import annotations
 import contextlib
 from datetime import timedelta
 from typing import TYPE_CHECKING
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from homeassistant.core import HomeAssistant
@@ -1391,6 +1391,7 @@ class TestCoordinatorRecovery:
 
         mock_websocket = MagicMock()
         mock_websocket.async_start_reconnect_loop = AsyncMock()
+        mock_websocket.connected = False
 
         coordinator = EmbyDataUpdateCoordinator(
             hass=hass,
@@ -1402,7 +1403,12 @@ class TestCoordinatorRecovery:
         coordinator._consecutive_failures = 5
         coordinator._websocket = mock_websocket
 
-        await coordinator._attempt_recovery()
+        # Reconnect now runs as a delayed background task so it never
+        # blocks the coordinator update path
+        with patch("asyncio.sleep", new_callable=AsyncMock):
+            await coordinator._attempt_recovery()
+            assert coordinator._websocket_reconnect_task is not None
+            await coordinator._websocket_reconnect_task
 
         # Should have tried to reconnect WebSocket
         mock_websocket.async_start_reconnect_loop.assert_called_once()
