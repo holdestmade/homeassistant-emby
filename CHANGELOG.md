@@ -62,6 +62,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - An Emby server still starting up returns 5xx, which raised `EmbyServerError`
     out of setup and left the entry in a permanent error state
   - Transient errors now raise `ConfigEntryNotReady` so Home Assistant retries
+- **Two options shown as raw keys in the UI**
+  - `library_scan_interval` and `server_scan_interval` were labelled in
+    `strings.json` but missing from `translations/en.json`, which is the file
+    Home Assistant serves, so the options dialog displayed the bare option
+    names. English is every locale's fallback, so all languages were affected
+  - Also removed translation entries for the retired per-platform prefix
+    options, which no longer correspond to anything in the config flow
 - **Deprecated `via_device` device registry parameter**
   - Entities linked to the server device with `via_device`, deprecated in
     favour of `via_device_id` and removed in Home Assistant 2027.8
