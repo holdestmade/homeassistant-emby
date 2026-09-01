@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.7.3] - 2026-09-01
 
 ### Fixed
 - **Home Assistant startup blocked for 10+ minutes** (troykelly#323, troykelly#331)
@@ -87,6 +87,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     existing key, so refreshing a hot entry dropped an unrelated one
 
 ### Changed
+- **Repository now ships the integration only** - the test suite, CI
+  workflows, development container and contributor tooling were removed.
+  Documentation links and the HACS install instructions point at this fork
+  rather than the upstream project
 - **Device name prefix is now a single option** (config entry version 2)
   - `prefix_media_player`, `prefix_notify` and `prefix_remote` all applied to
     the same device - one device backs every entity for a client - so only
@@ -113,10 +117,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   a single `_send`, removing ~150 lines of duplicated status handling, error
   translation and metrics code. All 74 call sites are unchanged
 
-- 1963 tests passing; the 19 pre-existing failures against current Home
-  Assistant were all caused by the entity ID bug above
-- `prefix_button` no longer has any effect: buttons share the server device,
-  whose name is registered without a prefix
+- All of the above was developed against the project's test suite (1963
+  tests passing at the time of the change); the suite, CI workflows and
+  development tooling have since been removed from this repository, which
+  now ships the integration and its documentation only
 
 
 ## [0.6.0] - 2026-01-11
@@ -398,7 +402,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Browse cache with LRU + TTL for performance
 - Graceful degradation on partial failures
 
-[Unreleased]: https://github.com/troykelly/homeassistant-emby/compare/v0.6.0...HEAD
+[0.7.3]: https://github.com/holdestmade/homeassistant-emby/compare/v0.6.0...v0.7.3
 [0.6.0]: https://github.com/troykelly/homeassistant-emby/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/troykelly/homeassistant-emby/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/troykelly/homeassistant-emby/compare/v0.4.1...v0.5.0

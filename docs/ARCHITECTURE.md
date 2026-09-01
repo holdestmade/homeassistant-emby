@@ -465,4 +465,4 @@ EmbyError (base)
 - **[Efficiency](EFFICIENCY.md)** - Performance optimization details
 - **[Configuration](CONFIGURATION.md)** - User configuration options
 - **[Services](SERVICES.md)** - Available service calls
-- **[CLAUDE.md](../CLAUDE.md)** - Development guidelines
+- **[README](../README.md)** - Overview and installation

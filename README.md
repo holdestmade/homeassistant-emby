@@ -10,7 +10,7 @@
 
 ---
 
-<h2 align="center"> Quick Start</h2>
+<h2 align="center">Quick Start</h2>
 
 <table align="center">
 <tr>
@@ -19,7 +19,7 @@
 **Install**
 
 Open HACS → Custom repositories
-Add: `troykelly/homeassistant-emby`
+Add: `holdestmade/homeassistant-emby`
 Download **Emby Media**
 
 </td>
@@ -44,34 +44,34 @@ as media players instantly!
 </table>
 
 <p align="center">
-  <a href="#-installation"><strong> Detailed Install Guide</strong></a> ·
-  <a href="#getting-an-api-key"><strong> Get API Key</strong></a> ·
-  <a href="docs/TROUBLESHOOTING.md"><strong> Having Issues?</strong></a>
+  <a href="#installation"><strong>Detailed Install Guide</strong></a> ·
+  <a href="#getting-an-api-key"><strong>Get API Key</strong></a> ·
+  <a href="docs/TROUBLESHOOTING.md"><strong>Having Issues?</strong></a>
 </p>
 
 ---
 
-<h3 align="center"> Jump to what you need</h3>
+<h3 align="center">Jump to what you need</h3>
 
 <p align="center">
-  <a href="#-what-can-you-do-with-it"> Features</a> ·
-  <a href="#-installation"> Installation</a> ·
-  <a href="#-automate-your-media"> Automations</a> ·
-  <a href="#-server-monitoring"> Sensors</a> ·
-  <a href="#-all-the-services"> Services</a> ·
-  <a href="#-troubleshooting"> Troubleshooting</a> ·
-  <a href="#-for-developers"> Developers</a>
+  <a href="#what-can-you-do-with-it">Features</a> ·
+  <a href="#installation">Installation</a> ·
+  <a href="#automate-your-media">Automations</a> ·
+  <a href="#server-monitoring">Sensors</a> ·
+  <a href="#all-the-services">Services</a> ·
+  <a href="#troubleshooting">Troubleshooting</a> ·
+  <a href="#for-developers">Developers</a>
 </p>
 
 ---
 
-##  What Can You Do With It?
+## What Can You Do With It?
 
 <table>
 <tr>
 <td width="50%">
 
-###  Control Any Emby Client
+### Control Any Emby Client
 
 Every device running Emby becomes controllable from Home Assistant. Play, pause, skip, seek, adjust volume—all from your dashboard, automations, or voice.
 
@@ -80,25 +80,25 @@ Every device running Emby becomes controllable from Home Assistant. Play, pause,
 </td>
 <td width="50%">
 
-###  Smart Home + Media = Magic
+### Smart Home + Media = Magic
 
 Lights dim when your movie starts. Playback pauses when the doorbell rings. Volume drops at night. Your media experience adapts to your life.
 
-**[See automation examples →](#-automate-your-media)**
+**[See automation examples →](#automate-your-media)**
 
 </td>
 </tr>
 <tr>
 <td width="50%">
 
-###  "Hey Google, play The Office"
+### "Hey Google, play The Office"
 
 Full voice assistant integration. Search your library, play content by name, control playback—all by voice through Google Home, Alexa, or Home Assistant's Assist.
 
 </td>
 <td width="50%">
 
-### 📺 Browse Your Library
+### Browse Your Library
 
 Navigate your entire Emby library right from Home Assistant. Browse by genre, year, actor, or collection. Click to play on any connected device.
 
@@ -107,14 +107,14 @@ Navigate your entire Emby library right from Home Assistant. Browse by genre, ye
 <tr>
 <td width="50%">
 
-### 🔊 Play Emby Music Anywhere
+### Play Emby Music Anywhere
 
 Cast your Emby music library to ANY Home Assistant media player—Sonos, Chromecast, smart speakers. Your music, everywhere.
 
 </td>
 <td width="50%">
 
-###  Real-Time Everything
+### Real-Time Everything
 
 WebSocket connection means instant updates. See what's playing, track progress, react to events—no polling delays, no stale data.
 
@@ -124,7 +124,7 @@ WebSocket connection means instant updates. See what's playing, track progress, 
 
 ---
 
-##  Requirements
+## Requirements
 
 | Component | Minimum Version |
 |-----------|----------------|
@@ -134,7 +134,7 @@ WebSocket connection means instant updates. See what's playing, track progress, 
 
 ---
 
-##  Installation
+## Installation
 
 ### Option 1: HACS (Recommended)
 
@@ -151,7 +151,7 @@ WebSocket connection means instant updates. See what's playing, track progress, 
 3. **Restart Home Assistant**
 
 <details>
-<summary> Expected folder structure</summary>
+<summary>Expected folder structure</summary>
 
 ```
 config/
@@ -167,7 +167,7 @@ config/
 
 ---
 
-##  Configuration
+## Configuration
 
 ### Getting an API Key
 
@@ -186,17 +186,17 @@ config/
 |-------|---------|-------|
 | Host | `192.168.1.100` | IP or hostname |
 | Port | `8096` | Default HTTP port |
-| Use SSL | ☐ | Check for HTTPS |
+| Use SSL | Unchecked | Check for HTTPS |
 | API Key | `abc123...` | From step above |
-| Verify SSL | ☐ | Uncheck for self-signed certs |
+| Verify SSL | Unchecked | Uncheck for self-signed certs |
 
 4. Click **Submit** — entities appear automatically!
 
-**[📖 Full Configuration Reference →](docs/CONFIGURATION.md)**
+**[Full Configuration Reference →](docs/CONFIGURATION.md)**
 
 ---
 
-##  Automate Your Media
+## Automate Your Media
 
 ### Dim Lights for Movie Night
 
@@ -236,7 +236,7 @@ automation:
         target:
           entity_id: notify.emby_living_room_tv
         data:
-          message: "Someone's at the door! 🚪"
+          message: "Someone's at the door!"
 ```
 
 ### Nightly Library Refresh
@@ -259,7 +259,7 @@ automation:
 
 ---
 
-## 📊 Server Monitoring
+## Server Monitoring
 
 Get visibility into your Emby server with built-in sensors:
 
@@ -291,7 +291,7 @@ Get visibility into your Emby server with built-in sensors:
 
 ---
 
-##  Live TV & DVR
+## Live TV & DVR
 
 Full Live TV support for Emby servers with tuners configured:
 
@@ -316,7 +316,7 @@ data:
 
 ---
 
-##  All the Services
+## All the Services
 
 ### Playback Control
 Standard `media_player.*` services work as expected: play, pause, stop, seek, volume, next/previous track.
@@ -365,16 +365,16 @@ Standard `media_player.*` services work as expected: play, pause, stop, seek, vo
 | Service | What it does |
 |---------|--------------|
 | `embymedia.run_scheduled_task` | Run any scheduled task |
-| `embymedia.restart_server` | Restart Emby server ⚠️ |
-| `embymedia.shutdown_server` | Shutdown Emby server ⚠️ |
+| `embymedia.restart_server` | Restart Emby server (use with caution) |
+| `embymedia.shutdown_server` | Shutdown Emby server (use with caution) |
 
 <p align="center">
-  <strong><a href="docs/SERVICES.md">📖 Complete Services Reference →</a></strong>
+  <strong><a href="docs/SERVICES.md">Complete Services Reference →</a></strong>
 </p>
 
 ---
 
-##  Media Browsing
+## Media Browsing
 
 Browse your entire library from Home Assistant:
 
@@ -391,17 +391,17 @@ Browse your entire library from Home Assistant:
 
 The **Media Source** provider lets you play Emby content on ANY Home Assistant media player:
 
--  Cast to Chromecast
--  Stream to Sonos
--  Play on Google/Nest speakers
--  Send to any media_player entity
+- Cast to Chromecast
+- Stream to Sonos
+- Play on Google/Nest speakers
+- Send to any media_player entity
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 <details>
-<summary><strong> Connection Failed</strong></summary>
+<summary><strong>Connection Failed</strong></summary>
 
 1. Verify Emby is running: Open `http://your-server:8096` in browser
 2. Check firewall allows the port
@@ -411,7 +411,7 @@ The **Media Source** provider lets you play Emby content on ANY Home Assistant m
 </details>
 
 <details>
-<summary><strong> Invalid API Key</strong></summary>
+<summary><strong>Invalid API Key</strong></summary>
 
 1. Generate a **new** API key in Emby Dashboard
 2. Check for extra spaces when pasting
@@ -420,7 +420,7 @@ The **Media Source** provider lets you play Emby content on ANY Home Assistant m
 </details>
 
 <details>
-<summary><strong> No Entities Appearing</strong></summary>
+<summary><strong>No Entities Appearing</strong></summary>
 
 1. Ensure an Emby client is **actively connected**
 2. Verify device supports remote control
@@ -430,7 +430,7 @@ The **Media Source** provider lets you play Emby content on ANY Home Assistant m
 </details>
 
 <details>
-<summary><strong> WebSocket Disconnecting</strong></summary>
+<summary><strong>WebSocket Disconnecting</strong></summary>
 
 1. Check network stability
 2. Try disabling WebSocket (falls back to polling)
@@ -446,24 +446,27 @@ The **Media Source** provider lets you play Emby content on ANY Home Assistant m
 Share the file when reporting issues (API keys are auto-redacted).
 
 <p align="center">
-  <strong><a href="docs/TROUBLESHOOTING.md">📖 Full Troubleshooting Guide →</a></strong>
+  <strong><a href="docs/TROUBLESHOOTING.md">Full Troubleshooting Guide →</a></strong>
 </p>
 
 ---
 
-##  Advanced Configuration
+## Advanced Configuration
 
 ### Options (Settings → Devices & Services → Emby Media → Configure)
 
 | Option | Default | Description |
 |--------|---------|-------------|
 | **Scan Interval** | 10s | Polling frequency (5-300s) |
-| **WebSocket** | ✓ | Real-time updates |
+| **WebSocket** | Yes | Real-time updates |
 | **Ignored Devices** | — | Hide specific clients |
-| **Ignore Web Players** | ✗ | Hide browser sessions |
-| **Direct Play** | ✓ | Try direct play first |
+| **Ignore Web Players** | No | Hide browser sessions |
+| **Direct Play** | Yes | Try direct play first |
 | **Video Container** | mp4 | Transcode format |
-| **Prefix entities with "Emby"** | ✓ | Per-entity-type toggles |
+| **Prefix Emby device names** | Yes | Add "Emby" to client device names |
+| **Discovery Sensors** | Yes | Next Up, Continue Watching, Recently Added |
+| **Library Scan Interval** | 1h | How often library counts refresh |
+| **Server Scan Interval** | 5m | How often server status refreshes |
 
 ### YAML Configuration (Optional)
 
@@ -478,12 +481,12 @@ embymedia:
 > Advanced options are configured through the UI after initial setup.
 
 <p align="center">
-  <strong><a href="docs/CONFIGURATION.md">📖 Full Configuration Reference →</a></strong>
+  <strong><a href="docs/CONFIGURATION.md">Full Configuration Reference →</a></strong>
 </p>
 
 ---
 
-##  For Developers
+## For Developers
 
 ### Entity Structure
 
@@ -519,31 +522,27 @@ The integration fires custom events:
 | `embymedia_notification` | Server notifications |
 | `embymedia_user_changed` | User account changes |
 
-### Contributing
+### Working on the Integration
 
-We welcome contributions! The project uses:
-
-- **Python 3.13+**
-- **Strict TDD** (100% test coverage required)
-- **Strict typing** (no `Any` types)
-- **mypy** + **ruff** for code quality
+The integration is written for Python 3.13+ and Home Assistant 2025.11.3 or
+newer. It uses strict typing throughout (no `Any`), with `mypy` and `ruff`
+for code quality.
 
 ```bash
-# Clone and setup
 git clone https://github.com/holdestmade/homeassistant-emby.git
 cd homeassistant-emby
-pip install -r requirements_test.txt
 
-# Run tests
-pytest tests/ --cov=custom_components.embymedia
+# Point a Home Assistant config directory at the component
+ln -s "$PWD/custom_components/embymedia" /path/to/config/custom_components/
 
-# Type check
+# Code quality
+ruff check custom_components/embymedia/
 mypy custom_components/embymedia/
 ```
 
 ---
 
-##  Documentation
+## Documentation
 
 | Document | Description |
 |----------|-------------|
@@ -552,12 +551,12 @@ mypy custom_components/embymedia/
 | **[Services](docs/SERVICES.md)** | Complete service reference |
 | **[Automations](docs/AUTOMATIONS.md)** | 50+ ready-to-use examples |
 | **[Troubleshooting](docs/TROUBLESHOOTING.md)** | Common issues & solutions |
+| **[Architecture](docs/ARCHITECTURE.md)** | How the integration is put together |
 | **[Changelog](CHANGELOG.md)** | Version history |
-| **[Contributing](CONTRIBUTING.md)** | Development guidelines |
 
 ---
 
-##  Acknowledgments
+## Acknowledgments
 
 - [Home Assistant](https://www.home-assistant.io/) — The incredible smart home platform
 - [Emby](https://emby.media/) — Media server software

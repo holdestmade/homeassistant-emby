@@ -26,7 +26,7 @@ Follow the [official HACS installation guide](https://hacs.xyz/docs/setup/downlo
 2. Click the ⋮ menu → **Custom repositories**
 3. Add repository:
    ```
-   https://github.com/troykelly/homeassistant-emby
+   https://github.com/holdestmade/homeassistant-emby
    ```
 4. Select **Integration** as category → **Add**
 5. Search for **"Emby Media"** → **Download**
@@ -35,7 +35,7 @@ Follow the [official HACS installation guide](https://hacs.xyz/docs/setup/downlo
 
 ### Option 2: Manual Installation
 
-1. Download `embymedia.zip` from the [Releases page](https://github.com/troykelly/homeassistant-emby/releases)
+1. Download `embymedia.zip` from the [Releases page](https://github.com/holdestmade/homeassistant-emby/releases)
 2. Extract the `embymedia` folder
 3. Copy to your `config/custom_components/` directory
 4. **Restart Home Assistant**
@@ -108,9 +108,9 @@ Older Home Assistant versions may not be supported.
 
 ## Getting Help
 
-1. Check [existing issues](https://github.com/troykelly/homeassistant-emby/issues)
+1. Check [existing issues](https://github.com/holdestmade/homeassistant-emby/issues)
 2. Search [Home Assistant Community Forums](https://community.home-assistant.io/)
-3. [Open a new issue](https://github.com/troykelly/homeassistant-emby/issues/new?template=bug_report.md) with:
+3. [Open a new issue](https://github.com/holdestmade/homeassistant-emby/issues/new?template=bug_report.md) with:
    - Your Home Assistant version
    - Your Emby Server version
    - Installation method used
