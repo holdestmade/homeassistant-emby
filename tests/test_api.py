@@ -2550,9 +2550,11 @@ class TestBrowseCacheIntegration:
         }
 
         with patch.object(client, "_request", new_callable=AsyncMock) as mock_request:
-            # First call for /Years fails with server error
+            # /Years fails, the filters endpoint reports nothing, so the
+            # full item scan is used as a last resort
             mock_request.side_effect = [
                 EmbyServerError("500 Internal Server Error"),
+                {"Years": []},
                 mock_items_response,
             ]
 
@@ -2586,9 +2588,10 @@ class TestBrowseCacheIntegration:
         }
 
         with patch.object(client, "_request", new_callable=AsyncMock) as mock_request:
-            # First call returns empty, second call gets items
+            # /Years empty, filters endpoint empty, then the item scan
             mock_request.side_effect = [
                 {"Items": [], "TotalRecordCount": 0},
+                {"Years": []},
                 mock_items_response,
             ]
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
+from collections.abc import Iterable
 from typing import TYPE_CHECKING, Self, cast
 
 import aiohttp
@@ -74,6 +75,10 @@ _LOGGER = logging.getLogger(__name__)
 
 # Version for User-Agent header
 __version__ = "0.5.1"
+
+# Upper bound for the last-resort year scan, used only when neither /Years nor
+# /Items/Filters is available. Each item costs bandwidth for a single field.
+MAX_YEAR_SCAN_ITEMS = 10000
 
 
 class EmbyClient:
@@ -1261,9 +1266,15 @@ class EmbyClient:
     ) -> list[EmbyBrowseItem]:
         """Get years from the library.
 
-        The Emby /Years endpoint is unreliable (returns 500 error on many servers).
-        This method uses a fallback approach: fetch items with ProductionYear field
-        and extract unique years.
+        Tries three sources in order of cost, because the cheap ones are not
+        available on every server:
+
+        1. `/Years`, the purpose-built endpoint, which returns 500 on many
+           servers
+        2. `/Items/Filters`, which returns the library's distinct production
+           years as a small array, deduplicated server-side
+        3. a full item scan, which transfers every item in the library just to
+           read one field off each - a last resort
 
         Args:
             user_id: The user ID.
@@ -1303,15 +1314,77 @@ class EmbyClient:
                 self._browse_cache.set(cache_key, items)
                 return items
         except EmbyServerError:
-            # /Years endpoint failed, use fallback
+            # /Years endpoint failed, try the next source
             pass
 
-        # Fallback: Extract years from items with ProductionYear field
-        items = await self._extract_years_from_items(user_id, parent_id, include_item_types)
+        # Ask the server for the distinct years it already knows about
+        items = await self._years_from_filters(user_id, parent_id, include_item_types)
+
+        if not items:
+            # Last resort: read ProductionYear off every item in the library
+            items = await self._extract_years_from_items(user_id, parent_id, include_item_types)
 
         # Cache the result
         self._browse_cache.set(cache_key, items)
         return items
+
+    async def _years_from_filters(
+        self,
+        user_id: str,
+        parent_id: str | None = None,
+        include_item_types: str | None = None,
+    ) -> list[EmbyBrowseItem]:
+        """Get distinct production years from the query filters endpoint.
+
+        `/Items/Filters` returns the distinct years present in a library as a
+        plain array, so the server does the deduplication and only a few dozen
+        integers cross the network - rather than every item in the library.
+
+        Args:
+            user_id: The user ID.
+            parent_id: Optional parent library ID.
+            include_item_types: Optional item types filter.
+
+        Returns:
+            Year items sorted newest first, empty if the endpoint is
+            unavailable or reports no years.
+        """
+        params = [f"UserId={user_id}"]
+        if parent_id:
+            params.append(f"ParentId={parent_id}")
+        if include_item_types:
+            params.append(f"IncludeItemTypes={include_item_types}")
+
+        endpoint = f"/Items/Filters?{'&'.join(params)}"
+
+        try:
+            response = await self._request(HTTP_GET, endpoint)
+        except (EmbyServerError, EmbyNotFoundError):
+            # Not available on this server; the caller falls back
+            _LOGGER.debug("Query filters endpoint unavailable for years")
+            return []
+
+        raw_years = response.get("Years")
+        if not isinstance(raw_years, list):
+            return []
+
+        years = {year for year in raw_years if isinstance(year, int) and year > 0}
+        return self._years_to_browse_items(years)
+
+    @staticmethod
+    def _years_to_browse_items(years: Iterable[int]) -> list[EmbyBrowseItem]:
+        """Convert year numbers into browse items, newest first.
+
+        Args:
+            years: Year numbers.
+
+        Returns:
+            List of year browse items.
+        """
+        return [
+            {"Id": str(year), "Name": str(year), "Type": "Year"}
+            for year in sorted(years, reverse=True)
+        ]
 
     async def _extract_years_from_items(
         self,
@@ -1331,14 +1404,19 @@ class EmbyClient:
         Returns:
             List of year items sorted newest first.
         """
-        # Fetch items with ProductionYear field
+        # Only ProductionYear is read off each item, so ask the server to skip
+        # the work and payload for everything else: image metadata, per-user
+        # play state, and the total-count query.
         params = [
             f"UserId={user_id}",
             "SortBy=ProductionYear",
             "SortOrder=Descending",
             "Fields=ProductionYear",
+            "EnableImages=false",
+            "EnableUserData=false",
+            "EnableTotalRecordCount=false",
             "Recursive=true",
-            "Limit=10000",  # Get all items to extract years
+            f"Limit={MAX_YEAR_SCAN_ITEMS}",
         ]
         if parent_id:
             params.append(f"ParentId={parent_id}")
@@ -1357,18 +1435,7 @@ class EmbyClient:
             if year and isinstance(year, int):
                 years_set.add(year)
 
-        # Convert to EmbyBrowseItem format, sorted newest first
-        items: list[EmbyBrowseItem] = []
-        for year in sorted(years_set, reverse=True):
-            items.append(
-                {
-                    "Id": str(year),
-                    "Name": str(year),
-                    "Type": "Year",
-                }
-            )
-
-        return items
+        return self._years_to_browse_items(years_set)
 
     async def async_get_playlist_items(
         self,
