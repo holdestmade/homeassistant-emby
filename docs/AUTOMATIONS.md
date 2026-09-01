@@ -195,7 +195,7 @@ automation:
           entity_id: notify.living_room_tv_notification
         data:
           title: "Dinner Time"
-          message: "Food is ready! 🍕"
+          message: "Food is ready!"
 ```
 
 ### Important Call Notification
@@ -253,7 +253,7 @@ automation:
           entity_id: notify.living_room_tv_notification
         data:
           title: "Bedtime"
-          message: "It's getting late! 😴"
+          message: "It's getting late!"
 ```
 
 ### Resume When Returning Home
@@ -525,9 +525,9 @@ automation:
           title: "Emby Weekly Report"
           message: >
             Library Stats:
-            🎬 Movies: {{ states('sensor.media_movies') }}
-            📺 TV Shows: {{ states('sensor.media_tv_shows') }}
-            🎵 Songs: {{ states('sensor.media_songs') }}
+            Movies: {{ states('sensor.media_movies') }}
+            TV Shows: {{ states('sensor.media_tv_shows') }}
+            Songs: {{ states('sensor.media_songs') }}
 ```
 
 ### Server Offline Alert
@@ -887,7 +887,7 @@ automation:
           entity_id: notify.kids_room_tv_notification
         data:
           title: "Screen Time"
-          message: "Time to take a break! 📚"
+          message: "Time to take a break!"
 ```
 
 ---
