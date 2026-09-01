@@ -4,7 +4,7 @@ Welcome to the Emby Media for Home Assistant documentation.
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 | Guide | Description |
 |-------|-------------|
@@ -23,7 +23,7 @@ Welcome to the Emby Media for Home Assistant documentation.
 
 ---
 
-## 🏗️ Technical Documentation
+## Technical Documentation
 
 | Guide | Description |
 |-------|-------------|
@@ -32,7 +32,7 @@ Welcome to the Emby Media for Home Assistant documentation.
 
 ---
 
-## 🔧 Quick Reference
+## Quick Reference
 
 ### Entities Created
 
@@ -79,7 +79,7 @@ Welcome to the Emby Media for Home Assistant documentation.
 
 ---
 
-## 📂 Document Index
+## Document Index
 
 ### User Documentation
 - [INSTALLATION.md](INSTALLATION.md) — Installation guide
@@ -91,25 +91,6 @@ Welcome to the Emby Media for Home Assistant documentation.
 ### Technical Documentation
 - [ARCHITECTURE.md](ARCHITECTURE.md) — System design overview
 - [EFFICIENCY.md](EFFICIENCY.md) — Performance best practices
-
-### Project Files
-- [CHANGELOG.md](../CHANGELOG.md) — Version history
-- [CONTRIBUTING.md](../CONTRIBUTING.md) — Contribution guidelines
-- [LICENSE](../LICENSE) — MIT License
-
-### Development (Internal)
-- [roadmap.md](roadmap.md) — Development phases
-- `phase-*-tasks.md` — Phase implementation details
-- [KNOWN_ISSUES.md](KNOWN_ISSUES.md) — Known issues tracking
-
----
-
-## ❓ Need Help?
-
-1. **Search this documentation** — Most answers are here
-2. **Check [Troubleshooting](TROUBLESHOOTING.md)** — Common issues solved
-3. **Search [GitHub Issues](https://github.com/troykelly/homeassistant-emby/issues)** — Someone may have asked
-4. **[Open an Issue](https://github.com/troykelly/homeassistant-emby/issues/new)** — We're here to help
 
 ---
 
