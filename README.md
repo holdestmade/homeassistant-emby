@@ -10,13 +10,13 @@
 
 ---
 
-<h2 align="center">🚀 Quick Start</h2>
+<h2 align="center"> Quick Start</h2>
 
 <table align="center">
 <tr>
 <td width="33%" align="center">
 
-**1️⃣ Install**
+**Install**
 
 Open HACS → Custom repositories
 Add: `troykelly/homeassistant-emby`
@@ -25,7 +25,7 @@ Download **Emby Media**
 </td>
 <td width="33%" align="center">
 
-**2️⃣ Configure**
+**Configure**
 
 Settings → Devices & Services
 Add Integration → **Emby Media**
@@ -34,7 +34,7 @@ Enter host + API key
 </td>
 <td width="33%" align="center">
 
-**3️⃣ Enjoy**
+**Enjoy**
 
 Your Emby clients appear
 as media players instantly!
@@ -44,34 +44,34 @@ as media players instantly!
 </table>
 
 <p align="center">
-  <a href="#-installation"><strong>📖 Detailed Install Guide</strong></a> ·
-  <a href="#getting-an-api-key"><strong>🔑 Get API Key</strong></a> ·
-  <a href="docs/TROUBLESHOOTING.md"><strong>❓ Having Issues?</strong></a>
+  <a href="#-installation"><strong> Detailed Install Guide</strong></a> ·
+  <a href="#getting-an-api-key"><strong> Get API Key</strong></a> ·
+  <a href="docs/TROUBLESHOOTING.md"><strong> Having Issues?</strong></a>
 </p>
 
 ---
 
-<h3 align="center">📍 Jump to what you need</h3>
+<h3 align="center"> Jump to what you need</h3>
 
 <p align="center">
-  <a href="#-what-can-you-do-with-it">✨ Features</a> ·
-  <a href="#-installation">📥 Installation</a> ·
-  <a href="#-automate-your-media">🤖 Automations</a> ·
-  <a href="#-server-monitoring">📊 Sensors</a> ·
-  <a href="#-all-the-services">🔧 Services</a> ·
-  <a href="#-troubleshooting">🐛 Troubleshooting</a> ·
-  <a href="#-for-developers">👩‍💻 Developers</a>
+  <a href="#-what-can-you-do-with-it"> Features</a> ·
+  <a href="#-installation"> Installation</a> ·
+  <a href="#-automate-your-media"> Automations</a> ·
+  <a href="#-server-monitoring"> Sensors</a> ·
+  <a href="#-all-the-services"> Services</a> ·
+  <a href="#-troubleshooting"> Troubleshooting</a> ·
+  <a href="#-for-developers"> Developers</a>
 </p>
 
 ---
 
-## ✨ What Can You Do With It?
+##  What Can You Do With It?
 
 <table>
 <tr>
 <td width="50%">
 
-### 🎬 Control Any Emby Client
+###  Control Any Emby Client
 
 Every device running Emby becomes controllable from Home Assistant. Play, pause, skip, seek, adjust volume—all from your dashboard, automations, or voice.
 
@@ -80,7 +80,7 @@ Every device running Emby becomes controllable from Home Assistant. Play, pause,
 </td>
 <td width="50%">
 
-### 🏠 Smart Home + Media = Magic
+###  Smart Home + Media = Magic
 
 Lights dim when your movie starts. Playback pauses when the doorbell rings. Volume drops at night. Your media experience adapts to your life.
 
@@ -91,7 +91,7 @@ Lights dim when your movie starts. Playback pauses when the doorbell rings. Volu
 <tr>
 <td width="50%">
 
-### 🗣️ "Hey Google, play The Office"
+###  "Hey Google, play The Office"
 
 Full voice assistant integration. Search your library, play content by name, control playback—all by voice through Google Home, Alexa, or Home Assistant's Assist.
 
@@ -114,7 +114,7 @@ Cast your Emby music library to ANY Home Assistant media player—Sonos, Chromec
 </td>
 <td width="50%">
 
-### ⚡ Real-Time Everything
+###  Real-Time Everything
 
 WebSocket connection means instant updates. See what's playing, track progress, react to events—no polling delays, no stale data.
 
@@ -124,34 +124,34 @@ WebSocket connection means instant updates. See what's playing, track progress, 
 
 ---
 
-## 📋 Requirements
+##  Requirements
 
 | Component | Minimum Version |
 |-----------|----------------|
-| **Home Assistant** | 2025.11.3+ |
+| **Home Assistant** | 2026.6.0+ |
 | **Emby Server** | 4.9.1.90+ |
 | **HACS** | Latest (for easy installation) |
 
 ---
 
-## 📥 Installation
+##  Installation
 
 ### Option 1: HACS (Recommended)
 
 1. Open **HACS** in Home Assistant
 2. Click ⋮ → **Custom repositories**
-3. Add `https://github.com/troykelly/homeassistant-emby` as **Integration**
+3. Add `https://github.com/holdestmade/homeassistant-emby` as **Integration**
 4. Search for **"Emby Media"** and click **Download**
 5. **Restart Home Assistant**
 
 ### Option 2: Manual
 
-1. Download the [latest release](https://github.com/troykelly/homeassistant-emby/releases)
+1. Download the [latest release](https://github.com/holdestmade/homeassistant-emby/releases)
 2. Extract `embymedia` folder to `config/custom_components/`
 3. **Restart Home Assistant**
 
 <details>
-<summary>📁 Expected folder structure</summary>
+<summary> Expected folder structure</summary>
 
 ```
 config/
@@ -167,7 +167,7 @@ config/
 
 ---
 
-## ⚙️ Configuration
+##  Configuration
 
 ### Getting an API Key
 
@@ -196,7 +196,7 @@ config/
 
 ---
 
-## 🤖 Automate Your Media
+##  Automate Your Media
 
 ### Dim Lights for Movie Night
 
@@ -254,7 +254,7 @@ automation:
 ```
 
 <p align="center">
-  <strong><a href="docs/AUTOMATIONS.md">📖 50+ More Automation Examples →</a></strong>
+  <strong><a href="docs/AUTOMATIONS.md">50+ More Automation Examples →</a></strong>
 </p>
 
 ---
@@ -291,7 +291,7 @@ Get visibility into your Emby server with built-in sensors:
 
 ---
 
-## 📺 Live TV & DVR
+##  Live TV & DVR
 
 Full Live TV support for Emby servers with tuners configured:
 
@@ -316,7 +316,7 @@ data:
 
 ---
 
-## 🔧 All the Services
+##  All the Services
 
 ### Playback Control
 Standard `media_player.*` services work as expected: play, pause, stop, seek, volume, next/previous track.
@@ -374,7 +374,7 @@ Standard `media_player.*` services work as expected: play, pause, stop, seek, vo
 
 ---
 
-## 🎵 Media Browsing
+##  Media Browsing
 
 Browse your entire library from Home Assistant:
 
@@ -391,17 +391,17 @@ Browse your entire library from Home Assistant:
 
 The **Media Source** provider lets you play Emby content on ANY Home Assistant media player:
 
-- 📺 Cast to Chromecast
-- 🔊 Stream to Sonos
-- 🎵 Play on Google/Nest speakers
-- 📻 Send to any media_player entity
+-  Cast to Chromecast
+-  Stream to Sonos
+-  Play on Google/Nest speakers
+-  Send to any media_player entity
 
 ---
 
 ## 🐛 Troubleshooting
 
 <details>
-<summary><strong>❌ Connection Failed</strong></summary>
+<summary><strong> Connection Failed</strong></summary>
 
 1. Verify Emby is running: Open `http://your-server:8096` in browser
 2. Check firewall allows the port
@@ -411,7 +411,7 @@ The **Media Source** provider lets you play Emby content on ANY Home Assistant m
 </details>
 
 <details>
-<summary><strong>🔑 Invalid API Key</strong></summary>
+<summary><strong> Invalid API Key</strong></summary>
 
 1. Generate a **new** API key in Emby Dashboard
 2. Check for extra spaces when pasting
@@ -420,7 +420,7 @@ The **Media Source** provider lets you play Emby content on ANY Home Assistant m
 </details>
 
 <details>
-<summary><strong>👻 No Entities Appearing</strong></summary>
+<summary><strong> No Entities Appearing</strong></summary>
 
 1. Ensure an Emby client is **actively connected**
 2. Verify device supports remote control
@@ -430,7 +430,7 @@ The **Media Source** provider lets you play Emby content on ANY Home Assistant m
 </details>
 
 <details>
-<summary><strong>⚡ WebSocket Disconnecting</strong></summary>
+<summary><strong> WebSocket Disconnecting</strong></summary>
 
 1. Check network stability
 2. Try disabling WebSocket (falls back to polling)
@@ -451,7 +451,7 @@ Share the file when reporting issues (API keys are auto-redacted).
 
 ---
 
-## ⚙️ Advanced Configuration
+##  Advanced Configuration
 
 ### Options (Settings → Devices & Services → Emby Media → Configure)
 
@@ -483,7 +483,7 @@ embymedia:
 
 ---
 
-## 👩‍💻 For Developers
+##  For Developers
 
 ### Entity Structure
 
@@ -530,7 +530,7 @@ We welcome contributions! The project uses:
 
 ```bash
 # Clone and setup
-git clone https://github.com/troykelly/homeassistant-emby.git
+git clone https://github.com/holdestmade/homeassistant-emby.git
 cd homeassistant-emby
 pip install -r requirements_test.txt
 
@@ -541,13 +541,9 @@ pytest tests/ --cov=custom_components.embymedia
 mypy custom_components/embymedia/
 ```
 
-<p align="center">
-  <strong><a href="CONTRIBUTING.md">📖 Contributing Guide →</a></strong>
-</p>
-
 ---
 
-## 📚 Documentation
+##  Documentation
 
 | Document | Description |
 |----------|-------------|
@@ -561,7 +557,7 @@ mypy custom_components/embymedia/
 
 ---
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - [Home Assistant](https://www.home-assistant.io/) — The incredible smart home platform
 - [Emby](https://emby.media/) — Media server software
@@ -569,13 +565,3 @@ mypy custom_components/embymedia/
 
 ---
 
-<p align="center">
-  <strong>Questions? Issues? Ideas?</strong><br>
-  <a href="https://github.com/troykelly/homeassistant-emby/issues/new?template=bug_report.md">🐛 Report Bug</a> ·
-  <a href="https://github.com/troykelly/homeassistant-emby/issues/new?template=feature_request.md">💡 Request Feature</a> ·
-  <a href="https://github.com/troykelly/homeassistant-emby/discussions">💬 Discussions</a>
-</p>
-
-<p align="center">
-  Made with ❤️ for the Home Assistant community
-</p>
