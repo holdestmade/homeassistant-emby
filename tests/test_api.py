@@ -968,7 +968,7 @@ class TestSendPlaybackCommand:
             mock_response.__aexit__ = AsyncMock(return_value=None)
 
             mock_session = MagicMock()
-            mock_session.post = MagicMock(return_value=mock_response)
+            mock_session.request = MagicMock(return_value=mock_response)
             mock_session.closed = False
             mock_session.close = AsyncMock()
             mock_session_class.return_value = mock_session
@@ -981,8 +981,8 @@ class TestSendPlaybackCommand:
             await client.async_send_playback_command("session-123", "Pause")
 
             # Verify POST was called with correct endpoint
-            mock_session.post.assert_called_once()
-            call_args = mock_session.post.call_args
+            mock_session.request.assert_called_once()
+            call_args = mock_session.request.call_args
             assert "/Sessions/session-123/Playing/Pause" in str(call_args)
             await client.close()
 
@@ -997,7 +997,7 @@ class TestSendPlaybackCommand:
             mock_response.__aexit__ = AsyncMock(return_value=None)
 
             mock_session = MagicMock()
-            mock_session.post = MagicMock(return_value=mock_response)
+            mock_session.request = MagicMock(return_value=mock_response)
             mock_session.closed = False
             mock_session.close = AsyncMock()
             mock_session_class.return_value = mock_session
@@ -1014,8 +1014,8 @@ class TestSendPlaybackCommand:
             )
 
             # Verify POST was called
-            mock_session.post.assert_called_once()
-            call_args = mock_session.post.call_args
+            mock_session.request.assert_called_once()
+            call_args = mock_session.request.call_args
             # Verify JSON body contains the seek position
             assert call_args.kwargs.get("json") == {"SeekPositionTicks": 50000000}
             await client.close()
@@ -1035,7 +1035,7 @@ class TestSendCommand:
             mock_response.__aexit__ = AsyncMock(return_value=None)
 
             mock_session = MagicMock()
-            mock_session.post = MagicMock(return_value=mock_response)
+            mock_session.request = MagicMock(return_value=mock_response)
             mock_session.closed = False
             mock_session.close = AsyncMock()
             mock_session_class.return_value = mock_session
@@ -1048,8 +1048,8 @@ class TestSendCommand:
             await client.async_send_command("session-123", "Mute")
 
             # Verify POST was called with correct endpoint
-            mock_session.post.assert_called_once()
-            call_args = mock_session.post.call_args
+            mock_session.request.assert_called_once()
+            call_args = mock_session.request.call_args
             assert "/Sessions/session-123/Command/Mute" in str(call_args)
             await client.close()
 
@@ -1064,7 +1064,7 @@ class TestSendCommand:
             mock_response.__aexit__ = AsyncMock(return_value=None)
 
             mock_session = MagicMock()
-            mock_session.post = MagicMock(return_value=mock_response)
+            mock_session.request = MagicMock(return_value=mock_response)
             mock_session.closed = False
             mock_session.close = AsyncMock()
             mock_session_class.return_value = mock_session
@@ -1081,8 +1081,8 @@ class TestSendCommand:
             )
 
             # Verify POST was called
-            mock_session.post.assert_called_once()
-            call_args = mock_session.post.call_args
+            mock_session.request.assert_called_once()
+            call_args = mock_session.request.call_args
             # Verify JSON body contains the volume
             assert call_args.kwargs.get("json") == {"Volume": 50}
             await client.close()
@@ -1098,7 +1098,7 @@ class TestSendCommand:
             mock_response.__aexit__ = AsyncMock(return_value=None)
 
             mock_session = MagicMock()
-            mock_session.post = MagicMock(return_value=mock_response)
+            mock_session.request = MagicMock(return_value=mock_response)
             mock_session.closed = False
             mock_session.close = AsyncMock()
             mock_session_class.return_value = mock_session
@@ -1895,7 +1895,7 @@ class TestSendGeneralCommand:
             mock_response.__aexit__ = AsyncMock(return_value=None)
 
             mock_session = MagicMock()
-            mock_session.post = MagicMock(return_value=mock_response)
+            mock_session.request = MagicMock(return_value=mock_response)
             mock_session.closed = False
             mock_session.close = AsyncMock()
             mock_session_class.return_value = mock_session
@@ -1912,8 +1912,8 @@ class TestSendGeneralCommand:
             )
 
             # Verify the POST was called with correct endpoint
-            mock_session.post.assert_called_once()
-            call_args = mock_session.post.call_args
+            mock_session.request.assert_called_once()
+            call_args = mock_session.request.call_args
             assert "/Sessions/session-123/Command" in str(call_args)
             await client.close()
 
@@ -1928,7 +1928,7 @@ class TestSendGeneralCommand:
             mock_response.__aexit__ = AsyncMock(return_value=None)
 
             mock_session = MagicMock()
-            mock_session.post = MagicMock(return_value=mock_response)
+            mock_session.request = MagicMock(return_value=mock_response)
             mock_session.closed = False
             mock_session.close = AsyncMock()
             mock_session_class.return_value = mock_session
@@ -1944,8 +1944,8 @@ class TestSendGeneralCommand:
                 None,
             )
 
-            mock_session.post.assert_called_once()
-            call_args = mock_session.post.call_args
+            mock_session.request.assert_called_once()
+            call_args = mock_session.request.call_args
             assert "/Sessions/session-123/Command" in str(call_args)
             await client.close()
 
@@ -2049,7 +2049,7 @@ class TestPlayItems:
             mock_response.__aexit__ = AsyncMock(return_value=None)
 
             mock_session = MagicMock()
-            mock_session.post = MagicMock(return_value=mock_response)
+            mock_session.request = MagicMock(return_value=mock_response)
             mock_session.closed = False
             mock_session.close = AsyncMock()
             mock_session_class.return_value = mock_session
@@ -2062,8 +2062,8 @@ class TestPlayItems:
             await client.async_play_items("session-123", ["movie-456"])
 
             # Verify POST was called with correct endpoint
-            mock_session.post.assert_called_once()
-            call_args = mock_session.post.call_args
+            mock_session.request.assert_called_once()
+            call_args = mock_session.request.call_args
             assert "/Sessions/session-123/Playing" in str(call_args)
             await client.close()
 
@@ -2078,7 +2078,7 @@ class TestPlayItems:
             mock_response.__aexit__ = AsyncMock(return_value=None)
 
             mock_session = MagicMock()
-            mock_session.post = MagicMock(return_value=mock_response)
+            mock_session.request = MagicMock(return_value=mock_response)
             mock_session.closed = False
             mock_session.close = AsyncMock()
             mock_session_class.return_value = mock_session
@@ -2090,7 +2090,7 @@ class TestPlayItems:
             )
             await client.async_play_items("session-123", ["movie-1", "movie-2", "movie-3"])
 
-            call_args = mock_session.post.call_args
+            call_args = mock_session.request.call_args
             json_body = call_args.kwargs.get("json", {})
             assert "movie-1,movie-2,movie-3" in json_body.get("ItemIds", "")
             await client.close()
@@ -2105,7 +2105,7 @@ class TestRequestPostErrors:
         with patch("aiohttp.ClientSession") as mock_session_class:
             mock_session = MagicMock()
             ssl_error = OSError("SSL certificate verify failed")
-            mock_session.post = MagicMock(
+            mock_session.request = MagicMock(
                 side_effect=aiohttp.ClientSSLError(MagicMock(), ssl_error)
             )
             mock_session.closed = False
@@ -2127,7 +2127,7 @@ class TestRequestPostErrors:
         """Test timeout in POST request."""
         with patch("aiohttp.ClientSession") as mock_session_class:
             mock_session = MagicMock()
-            mock_session.post = MagicMock(side_effect=TimeoutError())
+            mock_session.request = MagicMock(side_effect=TimeoutError())
             mock_session.closed = False
             mock_session.close = AsyncMock()
             mock_session_class.return_value = mock_session
@@ -2146,7 +2146,7 @@ class TestRequestPostErrors:
         """Test connection error in POST request."""
         with patch("aiohttp.ClientSession") as mock_session_class:
             mock_session = MagicMock()
-            mock_session.post = MagicMock(
+            mock_session.request = MagicMock(
                 side_effect=aiohttp.ClientConnectorError(MagicMock(), OSError("Connection refused"))
             )
             mock_session.closed = False
@@ -2167,7 +2167,7 @@ class TestRequestPostErrors:
         """Test generic client error in POST request."""
         with patch("aiohttp.ClientSession") as mock_session_class:
             mock_session = MagicMock()
-            mock_session.post = MagicMock(side_effect=aiohttp.ClientError("Generic error"))
+            mock_session.request = MagicMock(side_effect=aiohttp.ClientError("Generic error"))
             mock_session.closed = False
             mock_session.close = AsyncMock()
             mock_session_class.return_value = mock_session
@@ -2193,7 +2193,7 @@ class TestRequestPostErrors:
             mock_response.__aexit__ = AsyncMock(return_value=None)
 
             mock_session = MagicMock()
-            mock_session.post = MagicMock(return_value=mock_response)
+            mock_session.request = MagicMock(return_value=mock_response)
             mock_session.closed = False
             mock_session.close = AsyncMock()
             mock_session_class.return_value = mock_session
@@ -2882,7 +2882,7 @@ class TestRequestDeleteMethod:
             mock_response.__aexit__ = AsyncMock(return_value=None)
 
             mock_session = MagicMock()
-            mock_session.delete = MagicMock(return_value=mock_response)
+            mock_session.request = MagicMock(return_value=mock_response)
             mock_session.closed = False
             mock_session.close = AsyncMock()
             mock_session_class.return_value = mock_session
@@ -2900,7 +2900,7 @@ class TestRequestDeleteMethod:
             )
 
             # Verify delete was called
-            mock_session.delete.assert_called()
+            mock_session.request.assert_called()
             await client.close()
 
     @pytest.mark.asyncio
@@ -2914,7 +2914,7 @@ class TestRequestDeleteMethod:
             mock_response.__aexit__ = AsyncMock(return_value=None)
 
             mock_session = MagicMock()
-            mock_session.delete = MagicMock(return_value=mock_response)
+            mock_session.request = MagicMock(return_value=mock_response)
             mock_session.closed = False
             mock_session.close = AsyncMock()
             mock_session_class.return_value = mock_session
@@ -2938,7 +2938,7 @@ class TestRequestDeleteMethod:
         with patch("aiohttp.ClientSession") as mock_session_class:
             mock_session = MagicMock()
             ssl_error = OSError("SSL certificate verify failed")
-            mock_session.delete = MagicMock(
+            mock_session.request = MagicMock(
                 side_effect=aiohttp.ClientSSLError(MagicMock(), ssl_error)
             )
             mock_session.closed = False
@@ -2963,7 +2963,7 @@ class TestRequestDeleteMethod:
         """Test timeout in DELETE request."""
         with patch("aiohttp.ClientSession") as mock_session_class:
             mock_session = MagicMock()
-            mock_session.delete = MagicMock(side_effect=TimeoutError())
+            mock_session.request = MagicMock(side_effect=TimeoutError())
             mock_session.closed = False
             mock_session.close = AsyncMock()
             mock_session_class.return_value = mock_session
@@ -2985,7 +2985,7 @@ class TestRequestDeleteMethod:
         """Test connection error in DELETE request."""
         with patch("aiohttp.ClientSession") as mock_session_class:
             mock_session = MagicMock()
-            mock_session.delete = MagicMock(
+            mock_session.request = MagicMock(
                 side_effect=aiohttp.ClientConnectorError(MagicMock(), OSError("Connection refused"))
             )
             mock_session.closed = False
@@ -3009,7 +3009,7 @@ class TestRequestDeleteMethod:
         """Test generic client error in DELETE request."""
         with patch("aiohttp.ClientSession") as mock_session_class:
             mock_session = MagicMock()
-            mock_session.delete = MagicMock(side_effect=aiohttp.ClientError("Generic error"))
+            mock_session.request = MagicMock(side_effect=aiohttp.ClientError("Generic error"))
             mock_session.closed = False
             mock_session.close = AsyncMock()
             mock_session_class.return_value = mock_session
@@ -3027,8 +3027,13 @@ class TestRequestDeleteMethod:
             await client.close()
 
     @pytest.mark.asyncio
-    async def test_request_delete_unexpected_status_code(self) -> None:
-        """Test unexpected status code triggers raise_for_status."""
+    async def test_request_delete_not_found_raises_not_found(self) -> None:
+        """Test a 404 on DELETE raises EmbyNotFoundError.
+
+        Status mapping is shared by every verb, so a 404 is reported as
+        "not found" rather than as a connection failure, which is what the
+        separate DELETE implementation used to report.
+        """
         with patch("aiohttp.ClientSession") as mock_session_class:
             mock_response = MagicMock()
             mock_response.status = 404
@@ -3046,7 +3051,7 @@ class TestRequestDeleteMethod:
             )
 
             mock_session = MagicMock()
-            mock_session.delete = MagicMock(return_value=mock_response)
+            mock_session.request = MagicMock(return_value=mock_response)
             mock_session.closed = False
             mock_session.close = AsyncMock()
             mock_session_class.return_value = mock_session
@@ -3057,8 +3062,7 @@ class TestRequestDeleteMethod:
                 api_key="test-key",
             )
 
-            # ClientResponseError is a ClientError, so it should be wrapped
-            with pytest.raises(EmbyConnectionError):
+            with pytest.raises(EmbyNotFoundError):
                 await client.async_mark_unplayed(
                     user_id="user-123",
                     item_id="item-456",
@@ -3589,3 +3593,98 @@ class TestPlaylistManagementAPI:
             result = await client.async_get_playlists(user_id="user-123")
 
             assert len(result) == 0
+
+
+class TestUnifiedRequestHandling:
+    """Every verb shares one request implementation.
+
+    `_request`, `_request_post`, `_request_post_json` and `_request_delete`
+    were four near-identical copies of the same HTTP handling, which had
+    drifted: POST and DELETE mapped only 401/403, so a 404 or a 500 surfaced
+    as `EmbyConnectionError` - reporting a network failure for what was
+    actually a server response. They are now thin wrappers over `_send`.
+    """
+
+    @staticmethod
+    def _client_with_status(status: int, reason: str) -> tuple[EmbyClient, MagicMock]:
+        """Build a client whose session returns the given status."""
+        mock_response = MagicMock()
+        mock_response.status = status
+        mock_response.reason = reason
+        mock_response.__aenter__ = AsyncMock(return_value=mock_response)
+        mock_response.__aexit__ = AsyncMock(return_value=None)
+        mock_response.raise_for_status = MagicMock()
+
+        mock_session = MagicMock()
+        mock_session.request = MagicMock(return_value=mock_response)
+        mock_session.closed = False
+        mock_session.close = AsyncMock()
+
+        client = EmbyClient(host="emby.local", port=8096, api_key="test-key", session=mock_session)
+        return client, mock_session
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        ("status", "reason", "expected"),
+        [
+            (401, "Unauthorized", EmbyAuthenticationError),
+            (403, "Forbidden", EmbyAuthenticationError),
+            (404, "Not Found", EmbyNotFoundError),
+            (500, "Internal Server Error", EmbyServerError),
+            (503, "Service Unavailable", EmbyServerError),
+        ],
+    )
+    async def test_post_maps_status_codes(
+        self, status: int, reason: str, expected: type[Exception]
+    ) -> None:
+        """POST maps status codes the same way GET does."""
+        client, _ = self._client_with_status(status, reason)
+
+        with pytest.raises(expected):
+            await client.async_send_command("session-1", "Mute")
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        ("status", "reason", "expected"),
+        [
+            (401, "Unauthorized", EmbyAuthenticationError),
+            (404, "Not Found", EmbyNotFoundError),
+            (500, "Internal Server Error", EmbyServerError),
+        ],
+    )
+    async def test_delete_maps_status_codes(
+        self, status: int, reason: str, expected: type[Exception]
+    ) -> None:
+        """DELETE maps status codes the same way GET does."""
+        client, _ = self._client_with_status(status, reason)
+
+        with pytest.raises(expected):
+            await client.async_mark_unplayed(user_id="u1", item_id="i1")
+
+    @pytest.mark.asyncio
+    async def test_all_verbs_go_through_one_session_call(self) -> None:
+        """GET, POST and DELETE all issue `session.request`."""
+        client, mock_session = self._client_with_status(204, "No Content")
+
+        await client.async_send_command("session-1", "Mute")
+        await client.async_mark_unplayed(user_id="u1", item_id="i1")
+
+        methods = [call.args[0] for call in mock_session.request.call_args_list]
+        assert methods == ["POST", "DELETE"]
+
+    @pytest.mark.asyncio
+    async def test_no_content_is_success_for_every_verb(self) -> None:
+        """A 204 is a success with nothing to parse."""
+        client, _ = self._client_with_status(204, "No Content")
+
+        await client.async_send_command("session-1", "Mute")
+        await client.async_mark_unplayed(user_id="u1", item_id="i1")
+
+    @pytest.mark.asyncio
+    async def test_timeout_is_applied_to_every_request(self) -> None:
+        """The configured timeout is passed on each call, not just at setup."""
+        client, mock_session = self._client_with_status(204, "No Content")
+
+        await client.async_send_command("session-1", "Mute")
+
+        assert mock_session.request.call_args.kwargs["timeout"] is not None

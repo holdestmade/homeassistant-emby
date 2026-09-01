@@ -232,9 +232,7 @@ class TestBrowseThumbnailsUseTheProxy:
 
         coordinator = MagicMock()
         coordinator.server_id = "server123"
-        coordinator.client = EmbyClient(
-            host="emby.local", port=8096, api_key=API_KEY, ssl=True
-        )
+        coordinator.client = EmbyClient(host="emby.local", port=8096, api_key=API_KEY, ssl=True)
         coordinator.config_entry.options = {}
 
         player = EmbyMediaPlayer(coordinator, "device-1")

@@ -20,7 +20,9 @@ from .const import (
     ENDPOINT_SYSTEM_INFO_PUBLIC,
     ENDPOINT_USERS,
     HEADER_AUTHORIZATION,
+    HTTP_DELETE,
     HTTP_GET,
+    HTTP_POST,
     MAX_SEARCH_TERM_LENGTH,
     USER_AGENT_TEMPLATE,
     DeviceProfile,
@@ -270,32 +272,46 @@ class EmbyClient:
             self._owns_session = True
         return self._session
 
-    async def _request(
+    async def _send(
         self,
         method: str,
         endpoint: str,
+        *,
         include_auth: bool = True,
-    ) -> dict[str, object]:
-        """Make an HTTP request to the Emby API.
+        json_body: dict[str, object] | None = None,
+        content_type: str | None = None,
+        parse_json: bool,
+    ) -> dict[str, object] | None:
+        """Perform a request against the Emby API.
+
+        The single place where HTTP is spoken: every request method is a thin
+        wrapper around this, so status mapping, error translation, timeouts
+        and metrics behave identically regardless of the verb used.
 
         Args:
-            method: HTTP method (GET, POST, etc.).
+            method: HTTP method (GET, POST, DELETE).
             endpoint: API endpoint path.
-            include_auth: Whether to include authentication.
+            include_auth: Whether to include the authentication header.
+            json_body: Optional JSON body to send.
+            content_type: Optional explicit Content-Type header.
+            parse_json: Whether to parse and return a JSON response body.
 
         Returns:
-            Parsed JSON response as dictionary.
+            Parsed JSON response when `parse_json` is set and a body was
+            returned, otherwise None.
 
         Raises:
             EmbyConnectionError: Connection failed.
             EmbyAuthenticationError: Authentication failed (401/403).
             EmbyNotFoundError: Resource not found (404).
-            EmbyServerError: Server error (5xx).
+            EmbyServerError: Server error (5xx) or an unparsable body.
             EmbyTimeoutError: Request timed out.
             EmbySSLError: SSL certificate error.
         """
         url = f"{self.base_url}{endpoint}"
         headers = self._get_headers(include_auth)
+        if content_type is not None:
+            headers["Content-Type"] = content_type
         ssl_context = self._get_ssl_context()
 
         _LOGGER.debug(
@@ -315,6 +331,7 @@ class EmbyClient:
                 method,
                 url,
                 headers=headers,
+                json=json_body,
                 ssl=ssl_context,
                 timeout=self._timeout,
             ) as response:
@@ -340,7 +357,14 @@ class EmbyClient:
                     is_error = True
                     raise EmbyServerError(f"Server error: {response.status} {response.reason}")
 
+                # 204 No Content is a success with nothing to parse
+                if response.status == 204:
+                    return None
+
                 response.raise_for_status()
+
+                if not parse_json:
+                    return None
 
                 try:
                     return await response.json()  # type: ignore[no-any-return]
@@ -356,31 +380,17 @@ class EmbyClient:
 
         except aiohttp.ClientSSLError as err:
             is_error = True
-            _LOGGER.error(
-                "Emby API SSL error for %s %s: %s",
-                method,
-                endpoint,
-                err,
-            )
+            _LOGGER.error("Emby API SSL error for %s %s: %s", method, endpoint, err)
             raise EmbySSLError(f"SSL certificate error: {err}") from err
 
         except TimeoutError as err:
             is_error = True
-            _LOGGER.error(
-                "Emby API timeout for %s %s",
-                method,
-                endpoint,
-            )
+            _LOGGER.error("Emby API timeout for %s %s", method, endpoint)
             raise EmbyTimeoutError(f"Request timed out after {self._timeout.total}s") from err
 
         except aiohttp.ClientConnectorError as err:
             is_error = True
-            _LOGGER.error(
-                "Emby API connection error for %s %s: %s",
-                method,
-                endpoint,
-                err,
-            )
+            _LOGGER.error("Emby API connection error for %s %s: %s", method, endpoint, err)
             raise EmbyConnectionError(
                 f"Failed to connect to {self._host}:{self._port}: {err}"
             ) from err
@@ -404,18 +414,32 @@ class EmbyClient:
 
         except aiohttp.ClientError as err:
             is_error = True
-            _LOGGER.error(
-                "Emby API client error for %s %s: %s",
-                method,
-                endpoint,
-                err,
-            )
+            _LOGGER.error("Emby API client error for %s %s: %s", method, endpoint, err)
             raise EmbyConnectionError(f"Client error: {err}") from err
 
         finally:
             # Record API metrics (#293)
             duration_ms = (time.perf_counter() - start_time) * 1000
             self._metrics.record_api_call(endpoint, duration_ms, error=is_error)
+
+    async def _request(
+        self,
+        method: str,
+        endpoint: str,
+        include_auth: bool = True,
+    ) -> dict[str, object]:
+        """Make a request expecting a JSON object back.
+
+        Args:
+            method: HTTP method (GET, POST, etc.).
+            endpoint: API endpoint path.
+            include_auth: Whether to include authentication.
+
+        Returns:
+            Parsed JSON response as dictionary; empty when there was no body.
+        """
+        result = await self._send(method, endpoint, include_auth=include_auth, parse_json=True)
+        return result if result is not None else {}
 
     async def _coalesced_request(
         self,
@@ -558,7 +582,7 @@ class EmbyClient:
         endpoint: str,
         data: dict[str, object] | None = None,
     ) -> None:
-        """Make a POST request to the Emby API.
+        """Make a POST request that returns no body.
 
         Args:
             endpoint: API endpoint path.
@@ -567,75 +591,17 @@ class EmbyClient:
         Raises:
             EmbyConnectionError: Connection failed.
             EmbyAuthenticationError: Authentication failed.
+            EmbyNotFoundError: Resource not found.
+            EmbyServerError: Server error.
         """
-        url = f"{self.base_url}{endpoint}"
-        headers = self._get_headers()
-        ssl_context = self._get_ssl_context()
-
-        _LOGGER.debug(
-            "Emby API POST request: %s (data=%s)",
-            endpoint,
-            data,
-        )
-
-        session = await self._get_session()
-        start_time = time.perf_counter()
-        is_error = False
-
-        try:
-            async with session.post(
-                url,
-                headers=headers,
-                json=data,
-                ssl=ssl_context,
-                timeout=self._timeout,
-            ) as response:
-                _LOGGER.debug(
-                    "Emby API response: %s %s for POST %s",
-                    response.status,
-                    response.reason,
-                    endpoint,
-                )
-
-                if response.status in (401, 403):
-                    is_error = True
-                    raise EmbyAuthenticationError(f"Authentication failed: {response.status}")
-
-                # 204 No Content is success
-                if response.status == 204:
-                    return
-
-                response.raise_for_status()
-
-        except aiohttp.ClientSSLError as err:
-            is_error = True
-            raise EmbySSLError(f"SSL certificate error: {err}") from err
-
-        except TimeoutError as err:
-            is_error = True
-            raise EmbyTimeoutError(f"Request timed out after {self._timeout.total}s") from err
-
-        except aiohttp.ClientConnectorError as err:
-            is_error = True
-            raise EmbyConnectionError(
-                f"Failed to connect to {self._host}:{self._port}: {err}"
-            ) from err
-
-        except aiohttp.ClientError as err:
-            is_error = True
-            raise EmbyConnectionError(f"Client error: {err}") from err
-
-        finally:
-            # Record API metrics (#293)
-            duration_ms = (time.perf_counter() - start_time) * 1000
-            self._metrics.record_api_call(endpoint, duration_ms, error=is_error)
+        await self._send(HTTP_POST, endpoint, json_body=data, parse_json=False)
 
     async def _request_post_json(
         self,
         endpoint: str,
         data: dict[str, object] | None = None,
     ) -> dict[str, object]:
-        """Make a POST request to the Emby API and return JSON response.
+        """Make a POST request and return the parsed JSON response.
 
         Args:
             endpoint: API endpoint path.
@@ -650,81 +616,20 @@ class EmbyClient:
             EmbyNotFoundError: Resource not found.
             EmbyServerError: Server error.
         """
-        url = f"{self.base_url}{endpoint}"
-        headers = self._get_headers()
-        headers["Content-Type"] = "application/json"
-        ssl_context = self._get_ssl_context()
-
-        _LOGGER.debug(
-            "Emby API POST JSON request: %s (data=%s)",
+        result = await self._send(
+            HTTP_POST,
             endpoint,
-            data,
+            json_body=data,
+            content_type="application/json",
+            parse_json=True,
         )
-
-        session = await self._get_session()
-        start_time = time.perf_counter()
-        is_error = False
-
-        try:
-            async with session.post(
-                url,
-                headers=headers,
-                json=data,
-                ssl=ssl_context,
-                timeout=self._timeout,
-            ) as response:
-                _LOGGER.debug(
-                    "Emby API response: %s %s for POST %s",
-                    response.status,
-                    response.reason,
-                    endpoint,
-                )
-
-                if response.status in (401, 403):
-                    is_error = True
-                    raise EmbyAuthenticationError(
-                        f"Authentication failed: {response.status} {response.reason}"
-                    )
-
-                if response.status == 404:
-                    is_error = True
-                    raise EmbyNotFoundError(f"Resource not found: {endpoint}")
-
-                if response.status >= 500:
-                    is_error = True
-                    raise EmbyServerError(f"Server error: {response.status} {response.reason}")
-
-                response.raise_for_status()
-                return await response.json()  # type: ignore[no-any-return]
-
-        except aiohttp.ClientSSLError as err:
-            is_error = True
-            raise EmbySSLError(f"SSL certificate error: {err}") from err
-
-        except TimeoutError as err:
-            is_error = True
-            raise EmbyTimeoutError(f"Request timed out after {self._timeout.total}s") from err
-
-        except aiohttp.ClientConnectorError as err:
-            is_error = True
-            raise EmbyConnectionError(
-                f"Failed to connect to {self._host}:{self._port}: {err}"
-            ) from err
-
-        except aiohttp.ClientError as err:
-            is_error = True
-            raise EmbyConnectionError(f"Client error: {err}") from err
-
-        finally:
-            # Record API metrics (#293)
-            duration_ms = (time.perf_counter() - start_time) * 1000
-            self._metrics.record_api_call(endpoint, duration_ms, error=is_error)
+        return result if result is not None else {}
 
     async def _request_delete(
         self,
         endpoint: str,
     ) -> None:
-        """Make a DELETE request to the Emby API.
+        """Make a DELETE request.
 
         Args:
             endpoint: API endpoint path.
@@ -732,63 +637,10 @@ class EmbyClient:
         Raises:
             EmbyConnectionError: Connection failed.
             EmbyAuthenticationError: Authentication failed.
+            EmbyNotFoundError: Resource not found.
+            EmbyServerError: Server error.
         """
-        url = f"{self.base_url}{endpoint}"
-        headers = self._get_headers()
-        ssl_context = self._get_ssl_context()
-
-        _LOGGER.debug("Emby API DELETE request: %s", endpoint)
-
-        session = await self._get_session()
-        start_time = time.perf_counter()
-        is_error = False
-
-        try:
-            async with session.delete(
-                url,
-                headers=headers,
-                ssl=ssl_context,
-                timeout=self._timeout,
-            ) as response:
-                _LOGGER.debug(
-                    "Emby API response: %s %s for DELETE %s",
-                    response.status,
-                    response.reason,
-                    endpoint,
-                )
-
-                if response.status in (401, 403):
-                    is_error = True
-                    raise EmbyAuthenticationError(f"Authentication failed: {response.status}")
-
-                # 204 No Content is success
-                if response.status == 204:
-                    return
-
-                response.raise_for_status()
-
-        except aiohttp.ClientSSLError as err:
-            is_error = True
-            raise EmbySSLError(f"SSL certificate error: {err}") from err
-
-        except TimeoutError as err:
-            is_error = True
-            raise EmbyTimeoutError(f"Request timed out after {self._timeout.total}s") from err
-
-        except aiohttp.ClientConnectorError as err:
-            is_error = True
-            raise EmbyConnectionError(
-                f"Failed to connect to {self._host}:{self._port}: {err}"
-            ) from err
-
-        except aiohttp.ClientError as err:
-            is_error = True
-            raise EmbyConnectionError(f"Client error: {err}") from err
-
-        finally:
-            # Record API metrics (#293)
-            duration_ms = (time.perf_counter() - start_time) * 1000
-            self._metrics.record_api_call(endpoint, duration_ms, error=is_error)
+        await self._send(HTTP_DELETE, endpoint, parse_json=False)
 
     async def async_send_playback_command(
         self,
