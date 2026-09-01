@@ -309,7 +309,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: EmbyConfigEntry) -> bool
     # This prevents the via_device warning where entities reference
     # a server device that doesn't exist yet
     device_registry = dr.async_get(hass)
-    device_registry.async_get_or_create(
+    server_device = device_registry.async_get_or_create(
         config_entry_id=entry.entry_id,
         identifiers={(DOMAIN, server_id)},
         manufacturer="Emby",
@@ -317,6 +317,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: EmbyConfigEntry) -> bool
         name=server_name,
         sw_version=str(server_info.get("Version", "Unknown")),
     )
+    # Share the server device's registry id so entities can link to it with
+    # DeviceInfo's `via_device_id` on Home Assistant versions that support it
+    session_coordinator.server_device_id = server_device.id
 
     # Register image proxy view (only once, for first config entry)
     if DOMAIN not in hass.data:

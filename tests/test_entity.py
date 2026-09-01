@@ -9,9 +9,25 @@ import pytest
 from homeassistant.core import HomeAssistant
 
 from custom_components.embymedia.const import DOMAIN
+from custom_components.embymedia.entity import _SUPPORTS_VIA_DEVICE_ID
 
 if TYPE_CHECKING:
-    pass
+    from homeassistant.helpers.device_registry import DeviceInfo
+
+
+def assert_linked_to_server(device_info: DeviceInfo) -> None:
+    """Assert the device is linked to the Emby server device.
+
+    Home Assistant replaced `via_device` with `via_device_id`; which key is
+    used depends on the running Home Assistant version.
+    """
+    keys = dict(device_info)
+    if _SUPPORTS_VIA_DEVICE_ID:
+        assert keys["via_device_id"] == "server-device-registry-id"
+        assert "via_device" not in keys
+    else:
+        assert keys["via_device"] == (DOMAIN, "server-123")
+        assert "via_device_id" not in keys
 
 
 @pytest.fixture
@@ -32,6 +48,7 @@ def mock_coordinator(hass: HomeAssistant, mock_session: MagicMock) -> MagicMock:
 
     coordinator = MagicMock()
     coordinator.server_id = "server-123"
+    coordinator.server_device_id = "server-device-registry-id"
     coordinator.server_name = "My Emby Server"
     coordinator.last_update_success = True
     coordinator.data = {"device-abc-123": mock_session}
@@ -188,7 +205,7 @@ class TestEmbyEntityDeviceInfo:
         assert device_info["manufacturer"] == "Emby"
         assert device_info["model"] == "Emby Theater"
         assert device_info["sw_version"] == "4.9.2.0"
-        assert device_info["via_device"] == (DOMAIN, "server-123")
+        assert_linked_to_server(device_info)
 
     def test_device_info_with_session_and_prefix_disabled(
         self,
@@ -216,7 +233,7 @@ class TestEmbyEntityDeviceInfo:
         assert device_info["manufacturer"] == "Emby"
         assert device_info["model"] == "Emby Theater"
         assert device_info["sw_version"] == "4.9.2.0"
-        assert device_info["via_device"] == (DOMAIN, "server-123")
+        assert_linked_to_server(device_info)
 
     def test_device_info_without_session(
         self,
@@ -242,7 +259,7 @@ class TestEmbyEntityDeviceInfo:
         assert device_info["manufacturer"] == "Emby"
         assert "model" not in device_info
         assert "sw_version" not in device_info
-        assert device_info["via_device"] == (DOMAIN, "server-123")
+        assert_linked_to_server(device_info)
 
 
 class TestEmbyEntityUniqueId:
@@ -470,3 +487,108 @@ class TestEmbyEntitySuggestedObjectId:
         )
 
         assert entity.suggested_object_id == "Emby Client device-a"
+
+
+class TestEmbyEntityViaDeviceCompatibility:
+    """Test the server device link across Home Assistant versions.
+
+    Home Assistant deprecated DeviceInfo's `via_device` (an identifier tuple)
+    in favour of `via_device_id` (the parent device's registry id). Using
+    `via_device` on a current version logs:
+
+        Detected that custom integration 'embymedia' calls
+        `device_registry.async_get_or_create` with a deprecated `via_device`
+        parameter; use `via_device_id` instead
+
+    but `via_device_id` is rejected by older versions, because device info
+    keys are passed to `async_get_or_create` as keyword arguments. Both
+    branches are tested here regardless of the Home Assistant under test.
+    """
+
+    def test_uses_via_device_id_when_supported(
+        self,
+        hass: HomeAssistant,
+        mock_coordinator: MagicMock,
+        mock_session: MagicMock,
+    ) -> None:
+        """Modern Home Assistant gets `via_device_id`, never `via_device`."""
+        from unittest.mock import patch
+
+        from custom_components.embymedia.entity import EmbyEntity
+
+        mock_coordinator.get_session.return_value = mock_session
+        entity = EmbyEntity(coordinator=mock_coordinator, device_id="device-abc-123")
+
+        with patch("custom_components.embymedia.entity._SUPPORTS_VIA_DEVICE_ID", True):
+            device_info = dict(entity.device_info)
+
+        assert device_info["via_device_id"] == "server-device-registry-id"
+        assert "via_device" not in device_info
+
+    def test_falls_back_to_via_device_when_unsupported(
+        self,
+        hass: HomeAssistant,
+        mock_coordinator: MagicMock,
+        mock_session: MagicMock,
+    ) -> None:
+        """Older Home Assistant still gets the `via_device` identifier tuple."""
+        from unittest.mock import patch
+
+        from custom_components.embymedia.entity import EmbyEntity
+
+        mock_coordinator.get_session.return_value = mock_session
+        entity = EmbyEntity(coordinator=mock_coordinator, device_id="device-abc-123")
+
+        with patch("custom_components.embymedia.entity._SUPPORTS_VIA_DEVICE_ID", False):
+            device_info = dict(entity.device_info)
+
+        assert device_info["via_device"] == (DOMAIN, "server-123")
+        assert "via_device_id" not in device_info
+
+    def test_no_link_when_server_device_id_unknown(
+        self,
+        hass: HomeAssistant,
+        mock_coordinator: MagicMock,
+        mock_session: MagicMock,
+    ) -> None:
+        """An unknown server device id leaves the device unlinked, not broken.
+
+        Passing `via_device_id=None` would be rejected, so the key is omitted
+        entirely and the device still registers.
+        """
+        from unittest.mock import patch
+
+        from custom_components.embymedia.entity import EmbyEntity
+
+        mock_coordinator.get_session.return_value = mock_session
+        mock_coordinator.server_device_id = None
+        entity = EmbyEntity(coordinator=mock_coordinator, device_id="device-abc-123")
+
+        with patch("custom_components.embymedia.entity._SUPPORTS_VIA_DEVICE_ID", True):
+            device_info = dict(entity.device_info)
+
+        assert "via_device_id" not in device_info
+        assert "via_device" not in device_info
+        assert device_info["identifiers"] == {(DOMAIN, "device-abc-123")}
+
+    def test_device_info_keys_are_accepted_by_device_registry(
+        self,
+        hass: HomeAssistant,
+        mock_coordinator: MagicMock,
+        mock_session: MagicMock,
+    ) -> None:
+        """Every emitted key must be a real DeviceInfo key for this HA version.
+
+        Entity platforms pass device info straight to `async_get_or_create`
+        as keyword arguments, so an unknown key breaks entity registration.
+        """
+        from homeassistant.helpers.device_registry import DeviceInfo
+
+        from custom_components.embymedia.entity import EmbyEntity
+
+        mock_coordinator.get_session.return_value = mock_session
+        entity = EmbyEntity(coordinator=mock_coordinator, device_id="device-abc-123")
+
+        device_info = dict(entity.device_info)
+
+        assert set(device_info) <= set(DeviceInfo.__annotations__)
