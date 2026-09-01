@@ -8,6 +8,12 @@
   <strong>Your media server. Your smart home. Seamlessly connected.</strong>
 </p>
 
+<p align="center">
+  <strong>Based on the work of troykelly - https://github.com/troykelly/homeassistant-emby.</strong>
+</p>
+
+
+
 ---
 
 <h2 align="center">Quick Start</h2>
