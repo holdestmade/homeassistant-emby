@@ -38,8 +38,6 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
-    CONF_PREFIX_BUTTON,
-    DEFAULT_PREFIX_BUTTON,
     DOMAIN,
     EmbyConfigEntry,
     EmbyScheduledTask,
@@ -120,24 +118,6 @@ class EmbyRefreshLibraryButton(CoordinatorEntity["EmbyDataUpdateCoordinator"], B
         return f"{self.coordinator.server_id}_refresh_library"
 
     @property
-    def suggested_object_id(self) -> str | None:
-        """Return suggested object ID for entity ID generation.
-
-        This ensures the entity ID includes the 'Emby' prefix when the option
-        is enabled, matching the device name.
-
-        Returns:
-            Suggested object ID string (e.g., "emby_server_refresh_library").
-        """
-        use_prefix: bool = self.coordinator.config_entry.options.get(
-            CONF_PREFIX_BUTTON, DEFAULT_PREFIX_BUTTON
-        )
-        server_name = self.coordinator.server_name
-        device_name = f"Emby {server_name}" if use_prefix else server_name
-        # Include the entity name suffix for the full object ID
-        return f"{device_name} Refresh Library"
-
-    @property
     def device_info(self) -> DeviceInfo:
         """Return device information for the Emby server.
 
@@ -210,23 +190,6 @@ class EmbyRunLibraryScanButton(CoordinatorEntity["EmbyServerCoordinator"], Butto
             Unique identifier string based on server ID.
         """
         return f"{self.coordinator.server_id}_run_library_scan"
-
-    @property
-    def suggested_object_id(self) -> str | None:
-        """Return suggested object ID for entity ID generation.
-
-        This ensures the entity ID includes the 'Emby' prefix when the option
-        is enabled, matching the device name.
-
-        Returns:
-            Suggested object ID string (e.g., "emby_server_run_library_scan").
-        """
-        use_prefix: bool = self.coordinator.config_entry.options.get(
-            CONF_PREFIX_BUTTON, DEFAULT_PREFIX_BUTTON
-        )
-        server_name = self.coordinator.server_name
-        device_name = f"Emby {server_name}" if use_prefix else server_name
-        return f"{device_name} Run Library Scan"
 
     @property
     def device_info(self) -> DeviceInfo:

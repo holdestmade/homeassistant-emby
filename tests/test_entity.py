@@ -426,67 +426,80 @@ class TestEmbyEntityDeviceNameHelper:
         assert result == "Client device-a"
 
 
-class TestEmbyEntitySuggestedObjectId:
-    """Test suggested_object_id for correct entity ID generation (Phase 11)."""
+class TestEmbyEntityDeviceNaming:
+    """Test the device name that entity IDs are derived from.
 
-    def test_suggested_object_id_with_prefix_enabled(
+    These entities set `_attr_name = None` with `has_entity_name = True`, so
+    Home Assistant derives the entity ID from the device name. The device
+    name carries the optional 'Emby' prefix, so no `suggested_object_id`
+    override is needed - and one would actively break things, because Home
+    Assistant treats that value as an `object_id_base` and prefixes it with
+    the device name again, yielding IDs like
+    `media_player.emby_living_room_tv_emby_living_room_tv`.
+    """
+
+    def test_no_suggested_object_id_override(self) -> None:
+        """EmbyEntity must not override `suggested_object_id`.
+
+        Home Assistant composes the entity ID from the device name; an
+        override here is re-prefixed with that same device name.
+        """
+        from homeassistant.helpers.entity import Entity
+
+        from custom_components.embymedia.entity import EmbyEntity
+
+        assert "suggested_object_id" not in vars(EmbyEntity)
+        assert EmbyEntity.suggested_object_id is Entity.suggested_object_id
+
+    def test_device_name_includes_prefix_when_enabled(
         self,
         hass: HomeAssistant,
         mock_coordinator: MagicMock,
         mock_session: MagicMock,
     ) -> None:
-        """Test suggested_object_id includes 'Emby' prefix when enabled."""
+        """The device name carries the 'Emby' prefix when enabled."""
         from custom_components.embymedia.const import CONF_PREFIX_MEDIA_PLAYER
         from custom_components.embymedia.entity import EmbyEntity
 
         mock_coordinator.config_entry.options = {CONF_PREFIX_MEDIA_PLAYER: True}
         mock_coordinator.get_session.return_value = mock_session
 
-        entity = EmbyEntity(
-            coordinator=mock_coordinator,
-            device_id="device-abc-123",
-        )
+        entity = EmbyEntity(coordinator=mock_coordinator, device_id="device-abc-123")
 
-        assert entity.suggested_object_id == "Emby Living Room TV"
+        assert entity.device_info["name"] == "Emby Living Room TV"
 
-    def test_suggested_object_id_with_prefix_disabled(
+    def test_device_name_excludes_prefix_when_disabled(
         self,
         hass: HomeAssistant,
         mock_coordinator: MagicMock,
         mock_session: MagicMock,
     ) -> None:
-        """Test suggested_object_id excludes prefix when disabled."""
+        """The device name drops the prefix when disabled."""
         from custom_components.embymedia.const import CONF_PREFIX_MEDIA_PLAYER
         from custom_components.embymedia.entity import EmbyEntity
 
         mock_coordinator.config_entry.options = {CONF_PREFIX_MEDIA_PLAYER: False}
         mock_coordinator.get_session.return_value = mock_session
 
-        entity = EmbyEntity(
-            coordinator=mock_coordinator,
-            device_id="device-abc-123",
-        )
+        entity = EmbyEntity(coordinator=mock_coordinator, device_id="device-abc-123")
 
-        assert entity.suggested_object_id == "Living Room TV"
+        assert entity.device_info["name"] == "Living Room TV"
 
-    def test_suggested_object_id_fallback_when_session_none(
+    def test_device_name_falls_back_when_session_none(
         self,
         hass: HomeAssistant,
         mock_coordinator: MagicMock,
     ) -> None:
-        """Test suggested_object_id uses fallback when session is None."""
+        """The device name falls back to a short device id with no session."""
         from custom_components.embymedia.const import CONF_PREFIX_MEDIA_PLAYER
         from custom_components.embymedia.entity import EmbyEntity
 
         mock_coordinator.config_entry.options = {CONF_PREFIX_MEDIA_PLAYER: True}
         mock_coordinator.get_session.return_value = None
 
-        entity = EmbyEntity(
-            coordinator=mock_coordinator,
-            device_id="device-abc-123",
-        )
+        entity = EmbyEntity(coordinator=mock_coordinator, device_id="device-abc-123")
 
-        assert entity.suggested_object_id == "Emby Client device-a"
+        assert entity.device_info["name"] == "Emby Client device-a"
 
 
 class TestEmbyEntityViaDeviceCompatibility:
