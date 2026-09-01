@@ -44,6 +44,7 @@ def mock_client() -> MagicMock:
 def mock_coordinator(mock_client: MagicMock) -> MagicMock:
     """Create a mock discovery coordinator."""
     coordinator = MagicMock(spec=EmbyDiscoveryCoordinator)
+    coordinator.hass = MagicMock()
     coordinator.server_id = "server123"
     coordinator.server_name = "Emby Server"
     coordinator.user_id = "user456"
@@ -63,6 +64,7 @@ def mock_coordinator(mock_client: MagicMock) -> MagicMock:
 def mock_coordinator_with_data(mock_client: MagicMock) -> MagicMock:
     """Create a mock coordinator with sample data."""
     coordinator = MagicMock(spec=EmbyDiscoveryCoordinator)
+    coordinator.hass = MagicMock()
     coordinator.server_id = "server123"
     coordinator.server_name = "Emby Server"
     coordinator.user_id = "user456"

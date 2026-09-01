@@ -104,6 +104,7 @@ class EmbyDiscoverySensorBase(
         # which are recorded and exposed over the REST/WebSocket APIs, so they
         # must not carry the Emby API key.
         return async_get_image_proxy_url(
+            hass=self.coordinator.hass,
             server_id=self.coordinator.server_id,
             item_id=item_id,
             image_type=image_type,
@@ -134,6 +135,7 @@ class EmbyDiscoverySensorBase(
             return None
 
         return async_get_image_proxy_url(
+            hass=self.coordinator.hass,
             server_id=self.coordinator.server_id,
             item_id=series_id,
             image_type="Primary",

@@ -48,14 +48,15 @@ class TestEmbyImageProxyView:
         view = EmbyImageProxyView()
         assert view.name == "api:embymedia:image"
 
-    def test_view_requires_auth_is_false(self) -> None:
-        """Test that the view does not require authentication.
+    def test_view_requires_auth(self) -> None:
+        """Test that the view requires Home Assistant authentication.
 
-        Images should be accessible without HA authentication since
-        the proxy handles Emby authentication internally.
+        The proxy fetches images using the Emby API key, so it must not
+        serve anyone who can reach Home Assistant. URLs are handed out
+        signed, which satisfies the requirement from an `<img>` tag.
         """
         view = EmbyImageProxyView()
-        assert view.requires_auth is False
+        assert view.requires_auth is True
 
 
 class TestImageProxySetup:

@@ -1235,7 +1235,10 @@ class TestItemToBrowseMedia:
 
         # Thumbnails go through the image proxy, which keeps the API key
         # server-side rather than embedding it in a URL sent to the browser
-        assert result.thumbnail == ("/api/embymedia/image/server-123/album-123/Primary?tag=tag123")
+        assert result.thumbnail is not None
+        assert result.thumbnail.startswith(
+            "/api/embymedia/image/server-123/album-123/Primary?tag=tag123"
+        )
         mock_coordinator_for_browse.client.get_image_url.assert_not_called()
 
     def test_track_to_browse_media_with_thumbnail(
@@ -1260,7 +1263,10 @@ class TestItemToBrowseMedia:
             }
         )
 
-        assert result.thumbnail == ("/api/embymedia/image/server-123/track-123/Primary?tag=tag456")
+        assert result.thumbnail is not None
+        assert result.thumbnail.startswith(
+            "/api/embymedia/image/server-123/track-123/Primary?tag=tag456"
+        )
         mock_coordinator_for_browse.client.get_image_url.assert_not_called()
 
 

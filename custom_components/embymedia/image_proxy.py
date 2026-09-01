@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import timedelta
 from http import HTTPStatus
 from typing import TYPE_CHECKING
 from urllib.parse import quote, urlencode
@@ -10,6 +11,7 @@ from urllib.parse import quote, urlencode
 import aiohttp
 from aiohttp import web
 from homeassistant.components.http import HomeAssistantView
+from homeassistant.components.http.auth import async_sign_path
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import DOMAIN
@@ -21,6 +23,11 @@ if TYPE_CHECKING:
 
 # Base path of the image proxy view
 IMAGE_PROXY_BASE = "/api/embymedia/image"
+
+# How long a signed image URL stays valid. Signed URLs are handed out in entity
+# state attributes and browse results, which are refreshed far more often than
+# this, and it matches Home Assistant's own expiry for signed media content.
+IMAGE_URL_EXPIRY = timedelta(hours=24)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,6 +45,7 @@ IMAGE_FETCH_TIMEOUT = 10
 
 
 def async_get_image_proxy_url(
+    hass: HomeAssistant,
     server_id: str,
     item_id: str,
     image_type: str = "Primary",
@@ -45,14 +53,20 @@ def async_get_image_proxy_url(
     max_height: int | None = None,
     tag: str | None = None,
 ) -> str:
-    """Build a proxy URL for an Emby image.
+    """Build a signed proxy URL for an Emby image.
 
     Unlike `EmbyClient.get_image_url`, the returned URL carries no API key -
     the proxy view adds it server-side. Use this anywhere a URL is handed to
     clients, in particular entity state attributes, which are stored in the
     recorder database and served over the REST and WebSocket APIs.
 
+    The URL is signed so the proxy can require authentication while still
+    being usable from an `<img>` tag, which cannot send an auth header. The
+    signature covers the path and the query parameters, so neither the item
+    nor the requested size can be altered after signing.
+
     Args:
+        hass: Home Assistant instance, used to sign the path.
         server_id: The Emby server ID.
         item_id: The item ID.
         image_type: Image type (Primary, Backdrop, Thumb, etc.).
@@ -61,7 +75,7 @@ def async_get_image_proxy_url(
         tag: Optional image tag for cache busting.
 
     Returns:
-        Proxy URL path for the image.
+        Signed proxy URL path for the image.
     """
     path = (
         f"{IMAGE_PROXY_BASE}/{quote(server_id, safe='')}"
@@ -76,7 +90,20 @@ def async_get_image_proxy_url(
     if tag is not None:
         params["tag"] = tag
 
-    return f"{path}?{urlencode(params)}" if params else path
+    if params:
+        path = f"{path}?{urlencode(params)}"
+
+    # Signed with the content user: these URLs are built outside any request,
+    # during a coordinator refresh or while rendering a browse response.
+    try:
+        return async_sign_path(hass, path, IMAGE_URL_EXPIRY, use_content_user=True)
+    except KeyError:
+        # The http integration is a dependency, so its signing support is set
+        # up before this runs. Should that ever not hold, hand back the
+        # unsigned path: the proxy rejects it, which shows up as a missing
+        # image rather than an unauthenticated one.
+        _LOGGER.warning("Cannot sign Emby image URL: signed path support unavailable")
+        return path
 
 
 async def async_setup_image_proxy(hass: HomeAssistant) -> None:
@@ -92,9 +119,10 @@ async def async_setup_image_proxy(hass: HomeAssistant) -> None:
 class EmbyImageProxyView(HomeAssistantView):
     """Proxy view for Emby images.
 
-    This view proxies image requests to the Emby server, handling
-    authentication internally so that images can be accessed without
-    exposing the API key to clients.
+    This view proxies image requests to the Emby server, handling Emby
+    authentication internally so that images can be accessed without exposing
+    the API key to clients. Access to the view itself requires a Home
+    Assistant signed URL.
 
     URL pattern: /api/embymedia/image/{server_id}/{item_id}/{image_type}
 
@@ -107,7 +135,10 @@ class EmbyImageProxyView(HomeAssistantView):
 
     url = "/api/embymedia/image/{server_id}/{item_id}/{image_type}"
     name = "api:embymedia:image"
-    requires_auth = False  # Images are public, Emby auth is handled internally
+    # Requests must be authenticated. Callers cannot set an auth header on an
+    # <img> tag, so URLs are handed out signed by async_get_image_proxy_url and
+    # Home Assistant's auth middleware accepts the signature in their place.
+    requires_auth = True
 
     async def get(
         self,

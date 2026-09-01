@@ -426,7 +426,9 @@ class EmbyMediaSource(MediaSource):
                 thumbnail = None
                 if view.get("ImageTags", {}).get("Primary"):
                     thumbnail = async_get_image_proxy_url(
-                        server_id=coordinator.server_id, item_id=view_id
+                        hass=coordinator.hass,
+                        server_id=coordinator.server_id,
+                        item_id=view_id,
                     )
 
                 # Use special identifier for each library type
@@ -1995,7 +1997,11 @@ class EmbyMediaSource(MediaSource):
         thumbnail: str | None = None
         image_tags = item.get("ImageTags")
         if image_tags is not None and image_tags.get("Primary"):
-            thumbnail = async_get_image_proxy_url(server_id=coordinator.server_id, item_id=item_id)
+            thumbnail = async_get_image_proxy_url(
+                hass=coordinator.hass,
+                server_id=coordinator.server_id,
+                item_id=item_id,
+            )
 
         return BrowseMediaSource(
             domain=DOMAIN,

@@ -129,18 +129,20 @@ class TestImageProxyUrlBuilder:
         from custom_components.embymedia.image_proxy import async_get_image_proxy_url
 
         url = async_get_image_proxy_url(
+            hass=MagicMock(),
             server_id="server 123",
             item_id="item/../secret",
             image_type="Primary",
         )
 
-        assert url == "/api/embymedia/image/server%20123/item%2F..%2Fsecret/Primary"
+        assert url.startswith("/api/embymedia/image/server%20123/item%2F..%2Fsecret/Primary")
 
     def test_includes_optional_parameters(self) -> None:
         """Size and tag parameters are added when provided."""
         from custom_components.embymedia.image_proxy import async_get_image_proxy_url
 
         url = async_get_image_proxy_url(
+            hass=MagicMock(),
             server_id="s1",
             item_id="i1",
             max_width=300,
@@ -157,7 +159,7 @@ class TestImageProxyUrlBuilder:
         """The proxy URL never carries credentials."""
         from custom_components.embymedia.image_proxy import async_get_image_proxy_url
 
-        url = async_get_image_proxy_url(server_id="s1", item_id="i1", tag="t")
+        url = async_get_image_proxy_url(hass=MagicMock(), server_id="s1", item_id="i1", tag="t")
 
         assert "api_key" not in url
 

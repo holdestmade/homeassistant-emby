@@ -15,6 +15,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     disabling the integration was the only workaround
   - Both are now created with `hass.async_create_background_task`, which is
     excluded from the startup wait and still cancelled on shutdown
+- **Image proxy served anyone who could reach Home Assistant**
+  - The proxy fetches artwork using the Emby API key but declared
+    `requires_auth = False`, so any unauthenticated caller who could reach
+    Home Assistant could pull artwork for any item id
+  - It now requires authentication. URLs are handed out signed with Home
+    Assistant's signed-path support, which an `<img>` tag can load without an
+    auth header, and whose signature covers the item, image type and size
+  - Note: URLs are signed at generation time and regenerate on each refresh.
+    Hand-written dashboard references to `/api/embymedia/image/...` will need
+    to use the entity attribute instead of a hard-coded URL
 - **Emby API key exposed in state attributes**
   - Discovery sensors published `image_url` and `backdrop_url` built with an
     `api_key` query parameter. State attributes are stored in the recorder
@@ -87,11 +97,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   previously surfaced as `EmbyConnectionError`
 
 ### Technical
+- Library years are now read from Emby's `/Items/Filters` endpoint, which
+  returns the distinct production years as a small array. The previous
+  fallback transferred up to 10,000 items to read one field off each; it
+  remains as a last resort for servers without the endpoint, and now asks the
+  server to skip image metadata, per-user data and the total-count query
 - `api.py`: the four near-identical request methods are now thin wrappers over
   a single `_send`, removing ~150 lines of duplicated status handling, error
   translation and metrics code. All 74 call sites are unchanged
 
-- 1946 tests passing; the 19 pre-existing failures against current Home
+- 1963 tests passing; the 19 pre-existing failures against current Home
   Assistant were all caused by the entity ID bug above
 - `prefix_button` no longer has any effect: buttons share the server device,
   whose name is registered without a prefix

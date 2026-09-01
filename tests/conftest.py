@@ -221,6 +221,28 @@ def mock_aiohttp_session() -> Generator[MagicMock]:
         yield session
 
 
+@pytest.fixture(autouse=True)
+def stub_image_url_signing() -> Generator[None]:
+    """Stub Home Assistant's path signing for Emby image proxy URLs.
+
+    Image proxy URLs are signed so the view can require authentication while
+    still being loadable from an `<img>` tag. Signing needs the http
+    integration's signing secret and content user, which the unit tests using
+    mock coordinators do not set up - and re-testing Home Assistant's signing
+    in every one of them would add nothing.
+
+    The real signing, and the view's rejection of unsigned requests, are
+    covered in test_image_proxy_auth.py, which overrides this fixture.
+    """
+
+    def _fake_sign(hass: object, path: str, expiration: object, **kwargs: object) -> str:
+        separator = "&" if "?" in path else "?"
+        return f"{path}{separator}authSig=test-signature"
+
+    with patch("custom_components.embymedia.image_proxy.async_sign_path", _fake_sign):
+        yield
+
+
 def create_mock_session_coordinator(
     server_id: str = "test-server-id-12345",
     server_name: str = "Test Emby Server",

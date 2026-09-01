@@ -1599,6 +1599,7 @@ class EmbyMediaPlayer(EmbyEntity, MediaPlayerEntity):
         image_tags = library.get("ImageTags", {})
         if "Primary" in image_tags:
             thumbnail = async_get_image_proxy_url(
+                hass=coordinator.hass,
                 server_id=coordinator.server_id,
                 item_id=library["Id"],
                 tag=image_tags["Primary"],
@@ -1669,6 +1670,7 @@ class EmbyMediaPlayer(EmbyEntity, MediaPlayerEntity):
         image_tags = item.get("ImageTags", {})
         if "Primary" in image_tags:
             thumbnail = async_get_image_proxy_url(
+                hass=coordinator.hass,
                 server_id=coordinator.server_id,
                 item_id=item["Id"],
                 tag=image_tags["Primary"],
@@ -1701,6 +1703,7 @@ class EmbyMediaPlayer(EmbyEntity, MediaPlayerEntity):
         image_tags = season.get("ImageTags", {})
         if "Primary" in image_tags:
             thumbnail = async_get_image_proxy_url(
+                hass=coordinator.hass,
                 server_id=coordinator.server_id,
                 item_id=season["Id"],
                 tag=image_tags["Primary"],
@@ -1732,6 +1735,7 @@ class EmbyMediaPlayer(EmbyEntity, MediaPlayerEntity):
         image_tags = album.get("ImageTags", {})
         if "Primary" in image_tags:
             thumbnail = async_get_image_proxy_url(
+                hass=coordinator.hass,
                 server_id=coordinator.server_id,
                 item_id=album["Id"],
                 tag=image_tags["Primary"],
@@ -1763,6 +1767,7 @@ class EmbyMediaPlayer(EmbyEntity, MediaPlayerEntity):
         image_tags = track.get("ImageTags", {})
         if "Primary" in image_tags:
             thumbnail = async_get_image_proxy_url(
+                hass=coordinator.hass,
                 server_id=coordinator.server_id,
                 item_id=track["Id"],
                 tag=image_tags["Primary"],
@@ -2322,6 +2327,7 @@ class EmbyMediaPlayer(EmbyEntity, MediaPlayerEntity):
         if isinstance(image_tags, dict) and "Primary" in image_tags:
             person_id = str(person.get("Id", ""))
             thumbnail = async_get_image_proxy_url(
+                hass=coordinator.hass,
                 server_id=coordinator.server_id,
                 item_id=person_id,
                 tag=str(image_tags["Primary"]),
