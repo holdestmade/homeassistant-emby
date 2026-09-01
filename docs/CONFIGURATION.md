@@ -9,12 +9,12 @@ Everything you need to connect and customize your Emby Media integration.
 ### 1. Get Your API Key
 
 1. Open Emby Server Dashboard: `http://your-server:8096`
-2. **Settings** (⚙️) → **Advanced** → **API Keys**
+2. **Settings** → **Advanced** → **API Keys**
 3. Click **+ New API Key**
 4. Name it "Home Assistant" → **OK**
 5. **Copy the key** — you'll need it next
 
-> 💡 **Tip:** Store your API key securely. Anyone with this key can control your Emby server.
+> **Tip:** Store your API key securely. Anyone with this key can control your Emby server.
 
 ### 2. Add the Integration
 
