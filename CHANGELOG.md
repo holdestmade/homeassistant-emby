@@ -7,6 +7,79 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Home Assistant startup blocked for 10+ minutes** (troykelly#323, troykelly#331)
+  - The WebSocket receive loop and the health check loop were created with
+    `hass.async_create_task`. Bootstrap waits for every tracked task, so these
+    never-ending loops held startup open until the bootstrap timeout, and
+    disabling the integration was the only workaround
+  - Both are now created with `hass.async_create_background_task`, which is
+    excluded from the startup wait and still cancelled on shutdown
+- **Emby API key exposed in state attributes**
+  - Discovery sensors published `image_url` and `backdrop_url` built with an
+    `api_key` query parameter. State attributes are stored in the recorder
+    database and returned by `GET /api/states` to any token holder, so the key
+    was exposed to every Home Assistant user and persisted in history
+  - These URLs now go through the integration's image proxy, which adds the
+    key server-side. Media player artwork was never affected
+  - Hardened the (unauthenticated) image proxy: item id, image type and
+    forwarded query values are percent-encoded, so a crafted request cannot
+    inject query parameters into, or redirect, the authenticated upstream call
+- **Entity IDs repeated the device name**
+  - `EmbyEntity` and the server buttons overrode `suggested_object_id`, which
+    Home Assistant treats as an `object_id_base` and prefixes with the device
+    name, producing IDs like `media_player.living_room_living_room` and
+    `button.server_emby_server_refresh_library`
+  - Home Assistant now derives the IDs; the optional 'Emby' prefix continues to
+    work through the device name. Existing entities keep their registered IDs
+- **Background tasks outlived the config entry**
+  - The health check loop was never cancelled on unload, so each reload left
+    another loop polling the server through a stale client
+  - Added `EmbyDataUpdateCoordinator.async_shutdown`, registered as the entry's
+    unload callback, which stops the health check loop and the WebSocket
+- **WebSocket never reconnected after a dropped connection**
+  - A dropped connection fell back to polling permanently; the recovery path
+    reconnected without re-subscribing or restarting the receive loop, and
+    awaited a backoff of up to five minutes inside the coordinator update path
+  - Reconnection now runs as a background task that re-subscribes and restarts
+    the receive loop
+- **Request timeout was silently ignored**
+  - The client's 10 second timeout only applied when it created its own
+    session. Home Assistant always injects a shared session, so aiohttp's
+    5 minute default applied to every request
+  - The timeout is now passed per request; the WebSocket handshake is bounded too
+- **Setup failed permanently on a transient server error**
+  - An Emby server still starting up returns 5xx, which raised `EmbyServerError`
+    out of setup and left the entry in a permanent error state
+  - Transient errors now raise `ConfigEntryNotReady` so Home Assistant retries
+- **Deprecated `via_device` device registry parameter**
+  - Entities linked to the server device with `via_device`, deprecated in
+    favour of `via_device_id` and removed in Home Assistant 2027.8
+  - The integration now emits whichever key the running Home Assistant
+    supports, so it keeps working on 2025.11.3 as well as current releases
+- **Coalesced requests could deadlock**
+  - If the first caller of a coalesced request was cancelled, its shared future
+    was never resolved and every other waiter hung forever
+  - The shared request now runs in its own shielded task
+- **WebSocket refresh debounce used a wall clock**
+  - A backwards clock step (DST fall-back, NTP correction) made the elapsed
+    time negative and blocked WebSocket-driven refreshes for up to an hour;
+    it now measures elapsed time on the monotonic clock
+- **Browse cache evicted entries unnecessarily**
+  - `set()` evicted whenever the cache was full, including when overwriting an
+    existing key, so refreshing a hot entry dropped an unrelated one
+
+### Changed
+- Coordinator first refreshes now run concurrently during setup instead of
+  serially, which was one round of API calls per Emby user
+
+### Technical
+- 1924 tests passing; the 19 pre-existing failures against current Home
+  Assistant were all caused by the entity ID bug above
+- `prefix_button` no longer has any effect: buttons share the server device,
+  whose name is registered without a prefix
+
+
 ## [0.6.0] - 2026-01-11
 
 ### Fixed
