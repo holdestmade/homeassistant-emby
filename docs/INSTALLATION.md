@@ -41,7 +41,7 @@ Follow the [official HACS installation guide](https://hacs.xyz/docs/setup/downlo
 4. **Restart Home Assistant**
 
 <details>
-<summary>📁 Expected folder structure</summary>
+<summary>Expected folder structure</summary>
 
 ```
 config/
