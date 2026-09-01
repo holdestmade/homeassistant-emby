@@ -62,18 +62,8 @@
       "entity_options": {
         "title": "Entity Naming Options",
         "description": "Configure how entity names appear for {server_name}. By default, device names are prefixed with 'Emby' (e.g., 'Emby Living Room TV'). You can disable this for cleaner names.",
-        "data": {
-          "prefix_media_player": "Prefix media player names with 'Emby'",
-          "prefix_notify": "Prefix notify names with 'Emby'",
-          "prefix_remote": "Prefix remote names with 'Emby'",
-          "prefix_button": "Prefix button names with 'Emby'"
-        },
-        "data_description": {
-          "prefix_media_player": "When enabled, media player device names will start with 'Emby' (e.g., 'Emby Living Room TV')",
-          "prefix_notify": "When enabled, notification devices will have 'Emby' prefix",
-          "prefix_remote": "When enabled, remote control devices will have 'Emby' prefix",
-          "prefix_button": "When enabled, server action buttons will have 'Emby' prefix"
-        }
+        "data": {},
+        "data_description": {}
       }
     },
     "error": {
@@ -484,10 +474,6 @@
           "transcoding_profile": "Transcoding profile",
           "max_video_bitrate": "Max video bitrate (kbps)",
           "max_audio_bitrate": "Max audio bitrate (kbps)",
-          "prefix_media_player": "Prefix media player names with 'Emby'",
-          "prefix_notify": "Prefix notify names with 'Emby'",
-          "prefix_remote": "Prefix remote names with 'Emby'",
-          "prefix_button": "Prefix button names with 'Emby'",
           "enable_discovery_sensors": "Enable discovery sensors",
           "discovery_scan_interval": "Discovery scan interval (seconds)",
           "websocket_interval": "WebSocket session interval (ms)"
@@ -503,10 +489,6 @@
           "transcoding_profile": "Device profile for format negotiation (universal, chromecast, roku, appletv, audio_only)",
           "max_video_bitrate": "Maximum video bitrate for transcoding (leave empty for unlimited)",
           "max_audio_bitrate": "Maximum audio bitrate for transcoding (leave empty for unlimited)",
-          "prefix_media_player": "When enabled, device names will start with 'Emby' (e.g., 'Emby Living Room TV')",
-          "prefix_notify": "When enabled, notification entities will have 'Emby' prefix in their device names",
-          "prefix_remote": "When enabled, remote entities will have 'Emby' prefix in their device names",
-          "prefix_button": "When enabled, button entities will have 'Emby' prefix in their device names",
           "enable_discovery_sensors": "Create sensors for Next Up, Continue Watching, Recently Added, and Suggestions (requires a user to be selected)",
           "discovery_scan_interval": "Discovery scan interval (seconds)"
         }

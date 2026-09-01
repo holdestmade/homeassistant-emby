@@ -506,6 +506,8 @@
           "prefix_device_names": "Prefix Emby device names with 'Emby'",
           "enable_discovery_sensors": "Enable discovery sensors",
           "discovery_scan_interval": "Discovery scan interval (seconds)",
+          "library_scan_interval": "Library scan interval (seconds)",
+          "server_scan_interval": "Server scan interval (seconds)",
           "websocket_interval": "WebSocket session interval (ms)"
         },
         "data_description": {
@@ -521,7 +523,9 @@
           "max_audio_bitrate": "Maximum audio bitrate for transcoding (leave empty for unlimited)",
           "prefix_device_names": "When enabled, Emby client device names start with 'Emby' (e.g. 'Emby Living Room TV'). One device backs the media player, notify and remote entities for each client, so this applies to all of them.",
           "enable_discovery_sensors": "Create sensors for Next Up, Continue Watching, Recently Added, and Suggestions (requires a user to be selected)",
-          "discovery_scan_interval": "How often to update discovery sensors (300-3600 seconds, default: 900)"
+          "discovery_scan_interval": "How often to update discovery sensors (300-3600 seconds, default: 900)",
+          "library_scan_interval": "How often to poll library statistics like item counts (3600-86400 seconds, default: 3600)",
+          "server_scan_interval": "How often to poll server info like version and tasks (300-3600 seconds, default: 300)"
         }
       }
     }
