@@ -1,4 +1,4 @@
-# 📚 Emby Media Documentation
+# Emby Media Documentation
 
 Welcome to the Emby Media for Home Assistant documentation.
 
@@ -13,7 +13,7 @@ Welcome to the Emby Media for Home Assistant documentation.
 
 ---
 
-## 📖 User Guides
+## User Guides
 
 | Guide | Description |
 |-------|-------------|
