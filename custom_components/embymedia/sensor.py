@@ -705,6 +705,11 @@ class EmbyConnectedDevicesSensor(EmbyServerSensorBase):
     Extra attributes contain a list of all devices with details.
     """
 
+    # Holds one entry per known Emby device; recording the list on every state
+    # change bloats the database and can exceed the recorder's 16 KiB
+    # attribute limit, after which no attributes are stored at all.
+    _unrecorded_attributes = frozenset({"devices"})
+
     _attr_icon = "mdi:devices"
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_translation_key = "connected_devices"
@@ -756,6 +761,11 @@ class EmbyPluginCountSensor(EmbyServerSensorBase):
     Extra attributes contain a list of all plugins with details.
     """
 
+    # Holds one entry per installed plugin; recording the list on every state
+    # change bloats the database and can exceed the recorder's 16 KiB
+    # attribute limit, after which no attributes are stored at all.
+    _unrecorded_attributes = frozenset({"plugins"})
+
     _attr_icon = "mdi:puzzle"
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_translation_key = "plugins"
@@ -806,6 +816,11 @@ class EmbyWatchStatisticsSensor(EmbySessionSensorBase):
 
     Uses session coordinator since playback tracking happens via WebSocket.
     """
+
+    # Holds one entry per active playback session; recording the list on every state
+    # change bloats the database and can exceed the recorder's 16 KiB
+    # attribute limit, after which no attributes are stored at all.
+    _unrecorded_attributes = frozenset({"active_sessions"})
 
     _attr_icon = "mdi:chart-timeline-variant"
     _attr_state_class = SensorStateClass.TOTAL_INCREASING

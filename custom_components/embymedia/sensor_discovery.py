@@ -157,6 +157,12 @@ class EmbyNextUpSensor(EmbyDiscoverySensorBase):
     Extra state attributes contain the list of items with details.
     """
 
+    # The items list holds one entry per media item, each with signed
+    # artwork URLs. Recording it would write kilobytes per state change
+    # and can exceed the recorder's 16 KiB attribute limit, after which
+    # it stores no attributes for the entity at all.
+    _unrecorded_attributes = frozenset({"items"})
+
     _attr_icon = "mdi:television-play"
     _attr_translation_key = "next_up"
 
@@ -226,6 +232,12 @@ class EmbyContinueWatchingSensor(EmbyDiscoverySensorBase):
     Shows the count of partially watched movies and episodes.
     Extra state attributes contain the list of items with progress.
     """
+
+    # The items list holds one entry per media item, each with signed
+    # artwork URLs. Recording it would write kilobytes per state change
+    # and can exceed the recorder's 16 KiB attribute limit, after which
+    # it stores no attributes for the entity at all.
+    _unrecorded_attributes = frozenset({"items"})
 
     _attr_icon = "mdi:play-pause"
     _attr_translation_key = "continue_watching"
@@ -298,6 +310,12 @@ class EmbyRecentlyAddedSensor(EmbyDiscoverySensorBase):
     Extra state attributes contain the list of items.
     """
 
+    # The items list holds one entry per media item, each with signed
+    # artwork URLs. Recording it would write kilobytes per state change
+    # and can exceed the recorder's 16 KiB attribute limit, after which
+    # it stores no attributes for the entity at all.
+    _unrecorded_attributes = frozenset({"items"})
+
     _attr_icon = "mdi:new-box"
     _attr_translation_key = "recently_added"
 
@@ -367,6 +385,12 @@ class EmbySuggestionsSensor(EmbyDiscoverySensorBase):
     Shows the count of suggested items based on watch history.
     Extra state attributes contain the list of items with ratings.
     """
+
+    # The items list holds one entry per media item, each with signed
+    # artwork URLs. Recording it would write kilobytes per state change
+    # and can exceed the recorder's 16 KiB attribute limit, after which
+    # it stores no attributes for the entity at all.
+    _unrecorded_attributes = frozenset({"items"})
 
     _attr_icon = "mdi:lightbulb"
     _attr_translation_key = "suggestions"
