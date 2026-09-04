@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- **Large sensor attributes no longer stored in the recorder database**
+  - The discovery sensors publish an `items` list, and the device, plugin and
+    watch statistics sensors publish similar lists. Signing the artwork URLs
+    in 0.7.1 added roughly 280 bytes per URL, which more than doubled the
+    size of a discovery sensor's attributes
+  - Recorder refuses to store attributes for an entity once they exceed
+    16 KiB, logging "State attributes for <entity> exceed maximum size" and
+    then storing no attributes for that entity at all
+  - These lists are now marked as unrecorded, so they remain available to
+    templates and dashboards but are no longer written to the database on
+    every state change
+
 ## [0.7.3] - 2026-09-01
 
 ### Fixed
