@@ -6,13 +6,13 @@ import asyncio
 import contextlib
 import logging
 import time
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from datetime import date, datetime, timedelta
 from typing import TYPE_CHECKING, Any
 
 import aiohttp
 from homeassistant.const import CONF_ENTITY_ID, CONF_TYPE
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
@@ -129,6 +129,10 @@ class EmbyDataUpdateCoordinator(DataUpdateCoordinator[dict[str, EmbySession]]):
         self.server_name = server_name
         self.config_entry = config_entry
         self.server_device_id = None
+        # Callbacks told when a client device is removed from the device
+        # registry, so platforms can forget it and re-create its entities if
+        # the client ever starts a session again.
+        self._device_removed_listeners: list[Callable[[str], None]] = []
         self._user_id = user_id
         self._previous_sessions: set[str] = set()
         self._websocket: EmbyWebSocket | None = None
@@ -638,6 +642,37 @@ class EmbyDataUpdateCoordinator(DataUpdateCoordinator[dict[str, EmbySession]]):
             _LOGGER.info("Recovery successful, server is responding")
         except EmbyError:
             _LOGGER.warning("Recovery failed, server still unreachable")
+
+    @callback
+    def async_add_device_removed_listener(
+        self, listener: Callable[[str], None]
+    ) -> Callable[[], None]:
+        """Register a callback for when a client device is removed.
+
+        Args:
+            listener: Called with the Emby device id of the removed device.
+
+        Returns:
+            Callable that unregisters the listener.
+        """
+        self._device_removed_listeners.append(listener)
+
+        @callback
+        def _remove() -> None:
+            if listener in self._device_removed_listeners:
+                self._device_removed_listeners.remove(listener)
+
+        return _remove
+
+    @callback
+    def async_notify_device_removed(self, device_id: str) -> None:
+        """Tell platforms that a client device was removed from the registry.
+
+        Args:
+            device_id: The Emby device id of the removed device.
+        """
+        for listener in list(self._device_removed_listeners):
+            listener(device_id)
 
     def get_session(self, device_id: str) -> EmbySession | None:
         """Get a specific session by device ID.

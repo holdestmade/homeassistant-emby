@@ -373,6 +373,7 @@ Standard `media_player.*` services work as expected: play, pause, stop, seek, vo
 | `embymedia.run_scheduled_task` | Run any scheduled task |
 | `embymedia.restart_server` | Restart Emby server (use with caution) |
 | `embymedia.shutdown_server` | Shutdown Emby server (use with caution) |
+| `embymedia.remove_inactive_devices` | Delete every Emby client device that has no active session |
 
 <p align="center">
   <strong><a href="docs/SERVICES.md">Complete Services Reference →</a></strong>
@@ -432,6 +433,25 @@ The **Media Source** provider lets you play Emby content on ANY Home Assistant m
 2. Verify device supports remote control
 3. Check device isn't in "Ignored Devices" list
 4. Check Home Assistant logs for errors
+
+</details>
+
+<details>
+<summary><strong>Removing Old Devices (retired apps, DLNA renderers)</strong></summary>
+
+Emby clients are added as devices when they connect and stay listed after they
+are retired, or after the feature that created them (such as DLNA) is switched
+off on the Emby server.
+
+- **One at a time:** open the device under Settings → Devices & Services →
+  Emby Media, then use **⋮ → Delete**
+- **All at once:** run the `embymedia.remove_inactive_devices` action from
+  Developer Tools → Actions. It removes every client device without an active
+  session and lists what it removed
+
+The Emby server device and clients with an active session can't be deleted.
+A deleted client that connects again is added back automatically. To keep a
+client out permanently, add it to the **Ignored devices** option.
 
 </details>
 

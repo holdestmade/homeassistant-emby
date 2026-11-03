@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Delete stale Emby client devices**
+  - Client devices (retired apps, DLNA renderers left behind after DLNA is
+    switched off on the server, old browsers...) can now be deleted from the
+    device page with **⋮ → Delete**
+  - New `embymedia.remove_inactive_devices` action deletes every client
+    device without an active session in one go and returns the names it
+    removed
+  - The Emby server device and clients with an active session are protected.
+    A deleted client that starts a session again is re-added without needing
+    a reload
+
 ### Fixed
 - **Large sensor attributes no longer stored in the recorder database**
   - The discovery sensors publish an `items` list, and the device, plugin and

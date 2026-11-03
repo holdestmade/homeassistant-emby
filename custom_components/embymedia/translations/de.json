@@ -457,6 +457,10 @@
           "description": "Liste der Element-IDs, die aus der Sammlung entfernt werden sollen."
         }
       }
+    },
+    "remove_inactive_devices": {
+      "name": "Remove Inactive Devices",
+      "description": "Delete every Emby client device (and its entities) that does not currently have an active session on the Emby server, such as retired apps or DLNA renderers. Clients that start a session again are re-added automatically."
     }
   },
   "options": {
