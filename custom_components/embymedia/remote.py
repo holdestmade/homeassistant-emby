@@ -117,6 +117,11 @@ async def async_setup_entry(
 
     # Listen for new sessions
     entry.async_on_unload(coordinator.async_add_listener(async_add_remote_entities))
+    # Forget devices the user deletes so their entities come back if the
+    # client ever starts a new session.
+    entry.async_on_unload(
+        coordinator.async_add_device_removed_listener(known_devices.discard)
+    )
 
 
 class EmbyRemoteEntity(EmbyEntity, RemoteEntity):

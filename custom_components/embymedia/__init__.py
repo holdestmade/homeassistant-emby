@@ -74,6 +74,7 @@ from .const import (
 from .coordinator import EmbyDataUpdateCoordinator
 from .coordinator_discovery import EmbyDiscoveryCoordinator
 from .coordinator_sensors import EmbyLibraryCoordinator, EmbyServerCoordinator
+from .device_cleanup import async_can_remove_client_device
 from .exceptions import (
     EmbyAuthenticationError,
     EmbyError,
@@ -84,6 +85,7 @@ from .services import async_setup_services, async_unload_services
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
+    from homeassistant.helpers.device_registry import DeviceEntry
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -425,6 +427,32 @@ async def async_unload_entry(hass: HomeAssistant, entry: EmbyConfigEntry) -> boo
         _LOGGER.info("Unloaded Emby integration for entry %s", entry.entry_id)
 
     return unload_ok
+
+
+async def async_remove_config_entry_device(
+    hass: HomeAssistant,
+    entry: EmbyConfigEntry,
+    device_entry: DeviceEntry,
+) -> bool:
+    """Allow a stale Emby client device to be deleted from the UI.
+
+    Emby clients (apps, DLNA renderers, browsers...) are added as devices
+    when they start a session, and stay in the device registry after the
+    client is retired or the feature that created them (such as DLNA) is
+    switched off on the server. This lets the user delete them.
+
+    The Emby server device itself, and any client that currently has an
+    active session, can't be deleted: they would be re-created straight away.
+
+    Args:
+        hass: Home Assistant instance.
+        entry: Config entry the device belongs to.
+        device_entry: Device the user wants to delete.
+
+    Returns:
+        True if the device may be removed.
+    """
+    return async_can_remove_client_device(entry, device_entry)
 
 
 async def async_options_updated(hass: HomeAssistant, entry: EmbyConfigEntry) -> None:

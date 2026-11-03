@@ -9,13 +9,14 @@ from typing import TYPE_CHECKING
 
 import voluptuous as vol
 from homeassistant.const import ATTR_DEVICE_ID, ATTR_ENTITY_ID
-from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse, SupportsResponse
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 
 from .const import DOMAIN, MAX_SEARCH_TERM_LENGTH
+from .device_cleanup import async_remove_inactive_client_devices
 from .exceptions import EmbyConnectionError, EmbyError, EmbyNotFoundError
 
 if TYPE_CHECKING:
@@ -51,6 +52,8 @@ SERVICE_RESTART_SERVER = "restart_server"
 SERVICE_SHUTDOWN_SERVER = "shutdown_server"
 # Queue management services (Phase 14)
 SERVICE_CLEAR_QUEUE = "clear_queue"
+
+SERVICE_REMOVE_INACTIVE_DEVICES = "remove_inactive_devices"
 
 # Service attributes
 ATTR_MESSAGE = "message"
@@ -1347,6 +1350,20 @@ async def async_setup_services(hass: HomeAssistant) -> None:
         schema=CLEAR_QUEUE_SCHEMA,
     )
 
+    # Device registry cleanup
+    async def async_remove_inactive_devices(call: ServiceCall) -> ServiceResponse:
+        """Remove Emby client devices that have no active session."""
+        removed = async_remove_inactive_client_devices(hass)
+        return {"removed": removed, "count": len(removed)}
+
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_REMOVE_INACTIVE_DEVICES,
+        async_remove_inactive_devices,
+        schema=vol.Schema({}),
+        supports_response=SupportsResponse.OPTIONAL,
+    )
+
     _LOGGER.debug("Emby services registered")
 
 
@@ -1386,6 +1403,7 @@ async def async_unload_services(hass: HomeAssistant) -> None:
     hass.services.async_remove(DOMAIN, SERVICE_SHUTDOWN_SERVER)
     # Queue management services (Phase 14)
     hass.services.async_remove(DOMAIN, SERVICE_CLEAR_QUEUE)
+    hass.services.async_remove(DOMAIN, SERVICE_REMOVE_INACTIVE_DEVICES)
 
     _LOGGER.debug("Emby services unregistered")
 
