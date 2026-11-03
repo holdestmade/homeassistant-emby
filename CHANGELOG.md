@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-03
+
 ### Added
 - **Delete stale Emby client devices**
   - Client devices (retired apps, DLNA renderers left behind after DLNA is
@@ -18,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - The Emby server device and clients with an active session are protected.
     A deleted client that starts a session again is re-added without needing
     a reload
+
+## [0.7.4] - 2026-09-04
 
 ### Fixed
 - **Large sensor attributes no longer stored in the recorder database**
@@ -429,6 +433,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Browse cache with LRU + TTL for performance
 - Graceful degradation on partial failures
 
+[Unreleased]: https://github.com/holdestmade/homeassistant-emby/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/holdestmade/homeassistant-emby/compare/v0.7.4...v0.8.0
+[0.7.4]: https://github.com/holdestmade/homeassistant-emby/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/holdestmade/homeassistant-emby/compare/v0.6.0...v0.7.3
 [0.6.0]: https://github.com/troykelly/homeassistant-emby/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/troykelly/homeassistant-emby/compare/v0.5.0...v0.5.1
