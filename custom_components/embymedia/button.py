@@ -88,12 +88,12 @@ class EmbyRefreshLibraryButton(CoordinatorEntity["EmbyDataUpdateCoordinator"], B
     media files or making changes to the library structure.
 
     Attributes:
-        _attr_name: Entity name ("Refresh Library").
+        _attr_name: Entity name ("Refresh library").
         _attr_device_class: IDENTIFY class for action buttons.
         _attr_has_entity_name: Uses device name as prefix.
     """
 
-    _attr_name = "Refresh Library"
+    _attr_name = "Refresh library"
     _attr_device_class = ButtonDeviceClass.IDENTIFY
     _attr_has_entity_name = True
 
@@ -162,12 +162,12 @@ class EmbyRunLibraryScanButton(CoordinatorEntity["EmbyServerCoordinator"], Butto
     uses a different API endpoint.
 
     Attributes:
-        _attr_name: Entity name ("Run Library Scan").
+        _attr_name: Entity name ("Run library scan").
         _attr_device_class: IDENTIFY class for action buttons.
         _attr_has_entity_name: Uses device name as prefix.
     """
 
-    _attr_name = "Run Library Scan"
+    _attr_name = "Run library scan"
     _attr_device_class = ButtonDeviceClass.IDENTIFY
     _attr_has_entity_name = True
 

@@ -28,14 +28,14 @@
   "config": {
     "step": {
       "user": {
-        "title": "Connect to Emby Server",
+        "title": "Connect to Emby server",
         "description": "Enter your Emby server connection details.",
         "data": {
           "host": "Host",
           "port": "Port",
           "ssl": "Use SSL",
-          "api_key": "API Key",
-          "verify_ssl": "Verify SSL Certificate"
+          "api_key": "API key",
+          "verify_ssl": "Verify SSL certificate"
         },
         "data_description": {
           "host": "Hostname or IP address of your Emby server (e.g., 192.168.1.100 or emby.local)",
@@ -46,7 +46,7 @@
         }
       },
       "user_select": {
-        "title": "Select User",
+        "title": "Select user",
         "description": "Select a user context for {server_name}. Choose 'Use admin context' to use the API key without a specific user.",
         "data": {
           "user_id": "User"
@@ -56,11 +56,11 @@
         }
       },
       "reauth_confirm": {
-        "title": "Re-authenticate Emby Server",
+        "title": "Re-authenticate Emby server",
         "description": "The API key for {server_name} is no longer valid. Please enter a new API key."
       },
       "entity_options": {
-        "title": "Entity Naming Options",
+        "title": "Entity naming options",
         "description": "Configure how entity names appear for {server_name}. By default, device names are prefixed with 'Emby' (e.g., 'Emby Living Room TV'). You can disable this for cleaner names.",
         "data": {},
         "data_description": {}
@@ -85,30 +85,30 @@
   "entity": {
     "binary_sensor": {
       "server_connected": {
-        "name": "Server Connected"
+        "name": "Server connected"
       },
       "pending_restart": {
-        "name": "Pending Restart"
+        "name": "Pending restart"
       },
       "update_available": {
-        "name": "Update Available"
+        "name": "Update available"
       },
       "library_scan_active": {
-        "name": "Library Scan Active"
+        "name": "Library scan active"
       },
       "live_tv_enabled": {
-        "name": "Live TV Enabled"
+        "name": "Live TV enabled"
       }
     },
     "sensor": {
       "server_version": {
-        "name": "Server Version"
+        "name": "Server version"
       },
       "running_tasks": {
-        "name": "Running Tasks"
+        "name": "Running tasks"
       },
       "active_sessions": {
-        "name": "Active Sessions"
+        "name": "Active sessions"
       },
       "playing_sessions": {
         "name": "Воспроизводящие сеансы"
@@ -117,7 +117,7 @@
         "name": "Movies"
       },
       "series_count": {
-        "name": "TV Shows"
+        "name": "TV shows"
       },
       "episode_count": {
         "name": "Episodes"
@@ -138,13 +138,13 @@
         "name": "Collections"
       },
       "next_up": {
-        "name": "Next Up"
+        "name": "Next up"
       },
       "continue_watching": {
-        "name": "Continue Watching"
+        "name": "Continue watching"
       },
       "recently_added": {
-        "name": "Recently Added"
+        "name": "Recently added"
       },
       "suggestions": {
         "name": "Suggestions"
@@ -153,48 +153,48 @@
         "name": "Recordings"
       },
       "active_recordings": {
-        "name": "Active Recordings"
+        "name": "Active recordings"
       },
       "scheduled_timer_count": {
-        "name": "Scheduled Recordings"
+        "name": "Scheduled recordings"
       },
       "series_timer_count": {
-        "name": "Series Recording Rules"
+        "name": "Series recording rules"
       },
       "last_activity": {
-        "name": "Last Activity"
+        "name": "Last activity"
       },
       "connected_devices": {
-        "name": "Connected Devices"
+        "name": "Connected devices"
       },
       "watch_statistics": {
-        "name": "Watch Statistics"
+        "name": "Watch statistics"
       },
       "user_watch_statistics": {
-        "name": "User Watch Time"
+        "name": "User watch time"
       },
       "user_favorites_count": {
-        "name": "User Favorites"
+        "name": "User favorites"
       },
       "user_played_count": {
-        "name": "User Watched"
+        "name": "User watched"
       },
       "user_in_progress_count": {
-        "name": "User In Progress"
+        "name": "User in progress"
       },
       "user_playlist_count": {
-        "name": "User Playlists"
+        "name": "User playlists"
       }
     },
     "image": {
       "next_up_image": {
-        "name": "Next Up"
+        "name": "Next up"
       },
       "continue_watching_image": {
-        "name": "Continue Watching"
+        "name": "Continue watching"
       },
       "recently_added_image": {
-        "name": "Recently Added"
+        "name": "Recently added"
       },
       "suggestions_image": {
         "name": "Suggestions"
@@ -203,7 +203,7 @@
   },
   "services": {
     "send_message": {
-      "name": "Send Message",
+      "name": "Send message",
       "description": "Send a message to an Emby client.",
       "fields": {
         "message": {
@@ -221,7 +221,7 @@
       }
     },
     "send_command": {
-      "name": "Send Command",
+      "name": "Send command",
       "description": "Send a general command to an Emby client.",
       "fields": {
         "command": {
@@ -231,7 +231,7 @@
       }
     },
     "mark_played": {
-      "name": "Mark Played",
+      "name": "Mark played",
       "description": "Mark a media item as played.",
       "fields": {
         "item_id": {
@@ -245,7 +245,7 @@
       }
     },
     "mark_unplayed": {
-      "name": "Mark Unplayed",
+      "name": "Mark unplayed",
       "description": "Mark a media item as unplayed.",
       "fields": {
         "item_id": {
@@ -259,7 +259,7 @@
       }
     },
     "add_favorite": {
-      "name": "Add Favorite",
+      "name": "Add favorite",
       "description": "Add a media item to favorites.",
       "fields": {
         "item_id": {
@@ -273,7 +273,7 @@
       }
     },
     "remove_favorite": {
-      "name": "Remove Favorite",
+      "name": "Remove favorite",
       "description": "Remove a media item from favorites.",
       "fields": {
         "item_id": {
@@ -287,7 +287,7 @@
       }
     },
     "refresh_library": {
-      "name": "Refresh Library",
+      "name": "Refresh library",
       "description": "Trigger a library refresh on the Emby server.",
       "fields": {
         "library_id": {
@@ -297,7 +297,7 @@
       }
     },
     "play_instant_mix": {
-      "name": "Play Instant Mix",
+      "name": "Play instant mix",
       "description": "Play an instant mix based on an item (song, album, artist).",
       "fields": {
         "item_id": {
@@ -311,7 +311,7 @@
       }
     },
     "play_similar": {
-      "name": "Play Similar Items",
+      "name": "Play similar items",
       "description": "Play similar items based on a media item.",
       "fields": {
         "item_id": {
@@ -325,7 +325,7 @@
       }
     },
     "schedule_recording": {
-      "name": "Schedule Recording",
+      "name": "Schedule recording",
       "description": "Schedule a one-time recording for a Live TV program.",
       "fields": {
         "program_id": {
@@ -343,7 +343,7 @@
       }
     },
     "cancel_recording": {
-      "name": "Cancel Recording",
+      "name": "Cancel recording",
       "description": "Cancel a scheduled recording timer.",
       "fields": {
         "timer_id": {
@@ -353,25 +353,25 @@
       }
     },
     "cancel_series_timer": {
-      "name": "Cancel Series Timer",
+      "name": "Cancel series timer",
       "description": "Cancel a series recording timer (stops all future recordings in the series).",
       "fields": {
         "series_timer_id": {
-          "name": "Series Timer ID",
+          "name": "Series timer ID",
           "description": "The Emby series timer ID to cancel."
         }
       }
     },
     "create_playlist": {
-      "name": "Create Playlist",
+      "name": "Create playlist",
       "description": "Create a new playlist on the Emby server.",
       "fields": {
         "name": {
-          "name": "Playlist Name",
+          "name": "Playlist name",
           "description": "The name for the new playlist."
         },
         "media_type": {
-          "name": "Media Type",
+          "name": "Media type",
           "description": "The type of media for the playlist (Audio or Video)."
         },
         "user_id": {
@@ -385,7 +385,7 @@
       }
     },
     "add_to_playlist": {
-      "name": "Add to Playlist",
+      "name": "Add to playlist",
       "description": "Add items to an existing playlist.",
       "fields": {
         "playlist_id": {
@@ -403,7 +403,7 @@
       }
     },
     "remove_from_playlist": {
-      "name": "Remove from Playlist",
+      "name": "Remove from playlist",
       "description": "Remove items from a playlist.",
       "fields": {
         "playlist_id": {
@@ -411,7 +411,7 @@
           "description": "The ID of the playlist to remove items from."
         },
         "playlist_item_ids": {
-          "name": "Playlist Item IDs",
+          "name": "Playlist item IDs",
           "description": "List of PlaylistItemId values (from playlist items, NOT media item IDs)."
         }
       }
@@ -459,7 +459,7 @@
       }
     },
     "remove_inactive_devices": {
-      "name": "Remove Inactive Devices",
+      "name": "Remove inactive devices",
       "description": "Delete every Emby client device (and its entities) that does not currently have an active session on the Emby server, such as retired apps or DLNA renderers. Clients that start a session again are re-added automatically."
     }
   },

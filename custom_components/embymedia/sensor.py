@@ -98,7 +98,7 @@ async def async_setup_entry(
     ]
 
     # Add discovery sensors for each user's coordinator
-    # When admin context: creates sensors for ALL users (e.g., "troy Next Up", "matty Next Up")
+    # When admin context: creates sensors for ALL users (e.g., "troy next up", "matty next up")
     # When specific user: creates sensors for that user only
     for coordinator in discovery_coordinators.values():
         entities.extend(
@@ -893,7 +893,7 @@ class EmbyUserWatchStatisticsSensor(EmbySessionSensorBase):
         self._user_id = user_id
         self._user_name = user_name
         self._attr_unique_id = f"{coordinator.server_id}_{user_id}_watch_statistics"
-        self._attr_name = f"{user_name} Watch Time"
+        self._attr_name = f"{user_name} watch time"
 
     @property
     def native_value(self) -> int:
