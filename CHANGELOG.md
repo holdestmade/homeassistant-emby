@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Only the displayed names change. Entity IDs and unique IDs are unchanged,
     so existing automations, scripts and dashboards keep working
   - Entities you have renamed yourself keep your custom name
+- **Action names, setup dialogs and options now use sentence case** too, for
+  example "Send message", "Run scheduled task", "Shut down server", "Connect
+  to Emby server" and "API key". Action IDs such as
+  `embymedia.run_scheduled_task` are unchanged
 
 ## [0.8.0] - 2026-11-03
 

@@ -28,14 +28,14 @@
   "config": {
     "step": {
       "user": {
-        "title": "Connect to Emby Server",
+        "title": "Connect to Emby server",
         "description": "Enter your Emby server connection details.",
         "data": {
           "host": "Host",
           "port": "Port",
           "ssl": "Use SSL",
-          "api_key": "API Key",
-          "verify_ssl": "Verify SSL Certificate"
+          "api_key": "API key",
+          "verify_ssl": "Verify SSL certificate"
         },
         "data_description": {
           "host": "Hostname or IP address of your Emby server (e.g., 192.168.1.100 or emby.local)",
@@ -46,7 +46,7 @@
         }
       },
       "user_select": {
-        "title": "Select User",
+        "title": "Select user",
         "description": "Select a user context for {server_name}. Choose 'Use admin context' to use the API key without a specific user.",
         "data": {
           "user_id": "User"
@@ -56,11 +56,11 @@
         }
       },
       "reauth_confirm": {
-        "title": "Re-authenticate Emby Server",
+        "title": "Re-authenticate Emby server",
         "description": "The API key for {server_name} is no longer valid. Please enter a new API key."
       },
       "entity_options": {
-        "title": "Entity Naming Options",
+        "title": "Entity naming options",
         "description": "Configure how entity names appear for {server_name}. By default, device names are prefixed with 'Emby' (e.g., 'Emby Living Room TV'). You can disable this for cleaner names.",
         "data": {
           "prefix_device_names": "Prefix Emby device names with 'Emby'"
@@ -210,7 +210,7 @@
   },
   "services": {
     "send_message": {
-      "name": "Send Message",
+      "name": "Send message",
       "description": "Send a message to an Emby client.",
       "fields": {
         "message": {
@@ -228,7 +228,7 @@
       }
     },
     "send_command": {
-      "name": "Send Command",
+      "name": "Send command",
       "description": "Send a general command to an Emby client.",
       "fields": {
         "command": {
@@ -238,7 +238,7 @@
       }
     },
     "mark_played": {
-      "name": "Mark Played",
+      "name": "Mark played",
       "description": "Mark a media item as played.",
       "fields": {
         "item_id": {
@@ -252,7 +252,7 @@
       }
     },
     "mark_unplayed": {
-      "name": "Mark Unplayed",
+      "name": "Mark unplayed",
       "description": "Mark a media item as unplayed.",
       "fields": {
         "item_id": {
@@ -266,7 +266,7 @@
       }
     },
     "add_favorite": {
-      "name": "Add Favorite",
+      "name": "Add favorite",
       "description": "Add a media item to favorites.",
       "fields": {
         "item_id": {
@@ -280,7 +280,7 @@
       }
     },
     "remove_favorite": {
-      "name": "Remove Favorite",
+      "name": "Remove favorite",
       "description": "Remove a media item from favorites.",
       "fields": {
         "item_id": {
@@ -294,7 +294,7 @@
       }
     },
     "refresh_library": {
-      "name": "Refresh Library",
+      "name": "Refresh library",
       "description": "Trigger a library refresh on the Emby server.",
       "fields": {
         "library_id": {
@@ -304,7 +304,7 @@
       }
     },
     "play_instant_mix": {
-      "name": "Play Instant Mix",
+      "name": "Play instant mix",
       "description": "Play an instant mix based on an item (song, album, artist).",
       "fields": {
         "item_id": {
@@ -318,7 +318,7 @@
       }
     },
     "play_similar": {
-      "name": "Play Similar Items",
+      "name": "Play similar items",
       "description": "Play similar items based on a media item.",
       "fields": {
         "item_id": {
@@ -332,7 +332,7 @@
       }
     },
     "schedule_recording": {
-      "name": "Schedule Recording",
+      "name": "Schedule recording",
       "description": "Schedule a one-time recording for a Live TV program.",
       "fields": {
         "program_id": {
@@ -350,7 +350,7 @@
       }
     },
     "cancel_recording": {
-      "name": "Cancel Recording",
+      "name": "Cancel recording",
       "description": "Cancel a scheduled recording timer.",
       "fields": {
         "timer_id": {
@@ -360,25 +360,25 @@
       }
     },
     "cancel_series_timer": {
-      "name": "Cancel Series Timer",
+      "name": "Cancel series timer",
       "description": "Cancel a series recording timer (stops all future recordings in the series).",
       "fields": {
         "series_timer_id": {
-          "name": "Series Timer ID",
+          "name": "Series timer ID",
           "description": "The Emby series timer ID to cancel."
         }
       }
     },
     "create_playlist": {
-      "name": "Create Playlist",
+      "name": "Create playlist",
       "description": "Create a new playlist on the Emby server.",
       "fields": {
         "name": {
-          "name": "Playlist Name",
+          "name": "Playlist name",
           "description": "The name for the new playlist."
         },
         "media_type": {
-          "name": "Media Type",
+          "name": "Media type",
           "description": "The type of media for the playlist (Audio or Video)."
         },
         "user_id": {
@@ -392,7 +392,7 @@
       }
     },
     "add_to_playlist": {
-      "name": "Add to Playlist",
+      "name": "Add to playlist",
       "description": "Add items to an existing playlist.",
       "fields": {
         "playlist_id": {
@@ -410,7 +410,7 @@
       }
     },
     "remove_from_playlist": {
-      "name": "Remove from Playlist",
+      "name": "Remove from playlist",
       "description": "Remove items from a playlist.",
       "fields": {
         "playlist_id": {
@@ -418,17 +418,17 @@
           "description": "The ID of the playlist to remove items from."
         },
         "playlist_item_ids": {
-          "name": "Playlist Item IDs",
+          "name": "Playlist item IDs",
           "description": "List of PlaylistItemId values (from playlist items, NOT media item IDs)."
         }
       }
     },
     "create_collection": {
-      "name": "Create Collection",
+      "name": "Create collection",
       "description": "Create a new collection on the Emby server.",
       "fields": {
         "name": {
-          "name": "Collection Name",
+          "name": "Collection name",
           "description": "The name for the new collection."
         },
         "item_ids": {
@@ -438,7 +438,7 @@
       }
     },
     "add_to_collection": {
-      "name": "Add to Collection",
+      "name": "Add to collection",
       "description": "Add items to an existing collection.",
       "fields": {
         "collection_id": {
@@ -452,7 +452,7 @@
       }
     },
     "remove_from_collection": {
-      "name": "Remove from Collection",
+      "name": "Remove from collection",
       "description": "Remove items from a collection.",
       "fields": {
         "collection_id": {
@@ -466,7 +466,7 @@
       }
     },
     "run_scheduled_task": {
-      "name": "Run Scheduled Task",
+      "name": "Run scheduled task",
       "description": "Trigger a scheduled task to run immediately on the Emby server.",
       "fields": {
         "task_id": {
@@ -476,26 +476,26 @@
       }
     },
     "restart_server": {
-      "name": "Restart Server",
+      "name": "Restart server",
       "description": "Restart the Emby server. Requires administrator privileges."
     },
     "shutdown_server": {
-      "name": "Shutdown Server",
+      "name": "Shut down server",
       "description": "Shutdown the Emby server. Requires administrator privileges."
     },
     "clear_queue": {
-      "name": "Clear Queue",
+      "name": "Clear queue",
       "description": "Clear the playback queue and stop playback on an Emby client."
     },
     "remove_inactive_devices": {
-      "name": "Remove Inactive Devices",
+      "name": "Remove inactive devices",
       "description": "Delete every Emby client device (and its entities) that does not currently have an active session on the Emby server, such as retired apps or DLNA renderers. Clients that start a session again are re-added automatically."
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "Emby Options",
+        "title": "Emby options",
         "description": "Configure optional settings for the Emby integration.",
         "data": {
           "scan_interval": "Scan interval (seconds)",
