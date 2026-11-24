@@ -175,8 +175,8 @@ class EmbyNextUpSensor(EmbyDiscoverySensorBase):
         super().__init__(coordinator, server_name)
         # Include user_id in unique_id to support multi-user mode
         self._attr_unique_id = f"{coordinator.server_id}_{coordinator.user_id}_next_up"
-        # Set custom name with user name (e.g., "troy Next Up")
-        self._attr_name = f"{coordinator.user_name} Next Up"
+        # Set custom name with user name (e.g., "troy next up")
+        self._attr_name = f"{coordinator.user_name} next up"
 
     @property
     def native_value(self) -> int | None:
@@ -251,8 +251,8 @@ class EmbyContinueWatchingSensor(EmbyDiscoverySensorBase):
         super().__init__(coordinator, server_name)
         # Include user_id in unique_id to support multi-user mode
         self._attr_unique_id = f"{coordinator.server_id}_{coordinator.user_id}_continue_watching"
-        # Set custom name with user name (e.g., "troy Continue Watching")
-        self._attr_name = f"{coordinator.user_name} Continue Watching"
+        # Set custom name with user name (e.g., "troy continue watching")
+        self._attr_name = f"{coordinator.user_name} continue watching"
 
     @property
     def native_value(self) -> int | None:
@@ -328,8 +328,8 @@ class EmbyRecentlyAddedSensor(EmbyDiscoverySensorBase):
         super().__init__(coordinator, server_name)
         # Include user_id in unique_id to support multi-user mode
         self._attr_unique_id = f"{coordinator.server_id}_{coordinator.user_id}_recently_added"
-        # Set custom name with user name (e.g., "troy Recently Added")
-        self._attr_name = f"{coordinator.user_name} Recently Added"
+        # Set custom name with user name (e.g., "troy recently added")
+        self._attr_name = f"{coordinator.user_name} recently added"
 
     @property
     def native_value(self) -> int | None:
@@ -404,8 +404,8 @@ class EmbySuggestionsSensor(EmbyDiscoverySensorBase):
         super().__init__(coordinator, server_name)
         # Include user_id in unique_id to support multi-user mode
         self._attr_unique_id = f"{coordinator.server_id}_{coordinator.user_id}_suggestions"
-        # Set custom name with user name (e.g., "troy Suggestions")
-        self._attr_name = f"{coordinator.user_name} Suggestions"
+        # Set custom name with user name (e.g., "troy suggestions")
+        self._attr_name = f"{coordinator.user_name} suggestions"
 
     @property
     def native_value(self) -> int | None:
@@ -475,7 +475,7 @@ class EmbyUserFavoritesCountSensor(EmbyDiscoverySensorBase):
         """Initialize the user favorites count sensor."""
         super().__init__(coordinator, server_name)
         self._attr_unique_id = f"{coordinator.server_id}_{coordinator.user_id}_favorites_count"
-        self._attr_name = f"{coordinator.user_name} Favorites"
+        self._attr_name = f"{coordinator.user_name} favorites"
 
     @property
     def native_value(self) -> int | None:
@@ -511,7 +511,7 @@ class EmbyUserPlayedCountSensor(EmbyDiscoverySensorBase):
         """Initialize the user played count sensor."""
         super().__init__(coordinator, server_name)
         self._attr_unique_id = f"{coordinator.server_id}_{coordinator.user_id}_played_count"
-        self._attr_name = f"{coordinator.user_name} Watched"
+        self._attr_name = f"{coordinator.user_name} watched"
 
     @property
     def native_value(self) -> int | None:
@@ -547,7 +547,7 @@ class EmbyUserInProgressCountSensor(EmbyDiscoverySensorBase):
         """Initialize the user in-progress count sensor."""
         super().__init__(coordinator, server_name)
         self._attr_unique_id = f"{coordinator.server_id}_{coordinator.user_id}_in_progress_count"
-        self._attr_name = f"{coordinator.user_name} In Progress"
+        self._attr_name = f"{coordinator.user_name} in progress"
 
     @property
     def native_value(self) -> int | None:
@@ -583,7 +583,7 @@ class EmbyUserPlaylistCountSensor(EmbyDiscoverySensorBase):
         """Initialize the user playlist count sensor."""
         super().__init__(coordinator, server_name)
         self._attr_unique_id = f"{coordinator.server_id}_{coordinator.user_id}_playlist_count"
-        self._attr_name = f"{coordinator.user_name} Playlists"
+        self._attr_name = f"{coordinator.user_name} playlists"
 
     @property
     def native_value(self) -> int | None:

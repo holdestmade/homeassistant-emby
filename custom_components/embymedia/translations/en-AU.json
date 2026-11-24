@@ -89,39 +89,39 @@
   "entity": {
     "binary_sensor": {
       "server_connected": {
-        "name": "Server Connected"
+        "name": "Server connected"
       },
       "pending_restart": {
-        "name": "Pending Restart"
+        "name": "Pending restart"
       },
       "update_available": {
-        "name": "Update Available"
+        "name": "Update available"
       },
       "library_scan_active": {
-        "name": "Library Scan Active"
+        "name": "Library scan active"
       },
       "live_tv_enabled": {
-        "name": "Live TV Enabled"
+        "name": "Live TV enabled"
       }
     },
     "sensor": {
       "server_version": {
-        "name": "Server Version"
+        "name": "Server version"
       },
       "running_tasks": {
-        "name": "Running Tasks"
+        "name": "Running tasks"
       },
       "active_sessions": {
-        "name": "Active Sessions"
+        "name": "Active sessions"
       },
       "playing_sessions": {
-        "name": "Playing Sessions"
+        "name": "Playing sessions"
       },
       "movie_count": {
         "name": "Movies"
       },
       "series_count": {
-        "name": "TV Shows"
+        "name": "TV shows"
       },
       "episode_count": {
         "name": "Episodes"
@@ -142,13 +142,13 @@
         "name": "Collections"
       },
       "next_up": {
-        "name": "Next Up"
+        "name": "Next up"
       },
       "continue_watching": {
-        "name": "Continue Watching"
+        "name": "Continue watching"
       },
       "recently_added": {
-        "name": "Recently Added"
+        "name": "Recently added"
       },
       "suggestions": {
         "name": "Suggestions"
@@ -157,48 +157,48 @@
         "name": "Recordings"
       },
       "active_recordings": {
-        "name": "Active Recordings"
+        "name": "Active recordings"
       },
       "scheduled_timer_count": {
-        "name": "Scheduled Recordings"
+        "name": "Scheduled recordings"
       },
       "series_timer_count": {
-        "name": "Series Recording Rules"
+        "name": "Series recording rules"
       },
       "last_activity": {
-        "name": "Last Activity"
+        "name": "Last activity"
       },
       "connected_devices": {
-        "name": "Connected Devices"
+        "name": "Connected devices"
       },
       "watch_statistics": {
-        "name": "Watch Statistics"
+        "name": "Watch statistics"
       },
       "user_watch_statistics": {
-        "name": "User Watch Time"
+        "name": "User watch time"
       },
       "user_favorites_count": {
-        "name": "User Favorites"
+        "name": "User favorites"
       },
       "user_played_count": {
-        "name": "User Watched"
+        "name": "User watched"
       },
       "user_in_progress_count": {
-        "name": "User In Progress"
+        "name": "User in progress"
       },
       "user_playlist_count": {
-        "name": "User Playlists"
+        "name": "User playlists"
       }
     },
     "image": {
       "next_up_image": {
-        "name": "Next Up"
+        "name": "Next up"
       },
       "continue_watching_image": {
-        "name": "Continue Watching"
+        "name": "Continue watching"
       },
       "recently_added_image": {
-        "name": "Recently Added"
+        "name": "Recently added"
       },
       "suggestions_image": {
         "name": "Suggestions"

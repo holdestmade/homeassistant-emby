@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-11-24
+
+### Changed
+- **Entity names now use sentence case**, following the Home Assistant naming
+  guidelines (for example "Server connected", "Active sessions", "Refresh
+  library", "Alice next up")
+  - Only the displayed names change. Entity IDs and unique IDs are unchanged,
+    so existing automations, scripts and dashboards keep working
+  - Entities you have renamed yourself keep your custom name
+
 ## [0.8.0] - 2026-11-03
 
 ### Added

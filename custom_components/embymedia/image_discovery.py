@@ -201,7 +201,7 @@ class EmbyNextUpImage(EmbyDiscoveryImageBase):
     ) -> None:
         """Initialize the next up image entity."""
         self._attr_unique_id = f"{coordinator.server_id}_{coordinator.user_id}_next_up_image"
-        self._attr_name = f"{coordinator.user_name} Next Up"
+        self._attr_name = f"{coordinator.user_name} next up"
         super().__init__(hass, coordinator, server_name)
 
 
@@ -226,7 +226,7 @@ class EmbyContinueWatchingImage(EmbyDiscoveryImageBase):
         self._attr_unique_id = (
             f"{coordinator.server_id}_{coordinator.user_id}_continue_watching_image"
         )
-        self._attr_name = f"{coordinator.user_name} Continue Watching"
+        self._attr_name = f"{coordinator.user_name} continue watching"
         super().__init__(hass, coordinator, server_name)
 
 
@@ -249,7 +249,7 @@ class EmbyRecentlyAddedImage(EmbyDiscoveryImageBase):
     ) -> None:
         """Initialize the recently added image entity."""
         self._attr_unique_id = f"{coordinator.server_id}_{coordinator.user_id}_recently_added_image"
-        self._attr_name = f"{coordinator.user_name} Recently Added"
+        self._attr_name = f"{coordinator.user_name} recently added"
         super().__init__(hass, coordinator, server_name)
 
 
@@ -272,7 +272,7 @@ class EmbySuggestionsImage(EmbyDiscoveryImageBase):
     ) -> None:
         """Initialize the suggestions image entity."""
         self._attr_unique_id = f"{coordinator.server_id}_{coordinator.user_id}_suggestions_image"
-        self._attr_name = f"{coordinator.user_name} Suggestions"
+        self._attr_name = f"{coordinator.user_name} suggestions"
         super().__init__(hass, coordinator, server_name)
 
 
