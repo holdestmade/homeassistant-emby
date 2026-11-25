@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any
 
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -88,47 +88,40 @@ class EmbyEntity(CoordinatorEntity["EmbyDataUpdateCoordinator"]):
         session = self.session
         device_name = self._get_device_name()
 
-        if session is None:
-            # Fallback device info when session not available
-            device_info = DeviceInfo(
-                identifiers={(DOMAIN, self._device_id)},
-                name=device_name,
-                manufacturer="Emby",
-            )
-        else:
-            device_info = DeviceInfo(
-                identifiers={(DOMAIN, self._device_id)},
-                name=device_name,
-                manufacturer="Emby",
-                model=session.client_name,
-                sw_version=session.app_version,
-            )
+        # Every field is passed to the constructor. Since HA 2026.12 DeviceInfo
+        # is a dataclass and setting it like a dict afterwards is deprecated;
+        # on older versions it is a TypedDict, i.e. a plain dict. Building the
+        # keyword arguments first and constructing once works on both.
+        fields: dict[str, Any] = {
+            "identifiers": {(DOMAIN, self._device_id)},
+            "name": device_name,
+            "manufacturer": "Emby",
+        }
+        if session is not None:
+            fields["model"] = session.client_name
+            fields["sw_version"] = session.app_version
 
-        self._add_via_device(device_info)
-        return device_info
+        fields.update(self._via_device_fields())
+        return DeviceInfo(**fields)
 
-    def _add_via_device(self, device_info: DeviceInfo) -> None:
-        """Link this device to the Emby server device.
+    def _via_device_fields(self) -> dict[str, Any]:
+        """Return the device info fields linking this device to the server.
 
         Uses `via_device_id` where Home Assistant supports it and falls back
         to the deprecated `via_device` identifier tuple on older versions.
-        Neither key is set when the server device id is not known yet, which
+        Nothing is returned when the server device id is not known yet, which
         leaves the device unlinked rather than failing to register it.
 
-        Args:
-            device_info: Device info to add the server link to.
+        Returns:
+            The server link field, or an empty dict.
         """
-        # Written through a plain mapping: only one of these keys exists in
-        # any given Home Assistant version's DeviceInfo definition.
-        keys = cast("dict[str, object]", device_info)
-
         if not _SUPPORTS_VIA_DEVICE_ID:
-            keys["via_device"] = (DOMAIN, self.coordinator.server_id)
-            return
+            return {"via_device": (DOMAIN, self.coordinator.server_id)}
 
         server_device_id = self.coordinator.server_device_id
         if server_device_id is not None:
-            keys["via_device_id"] = server_device_id
+            return {"via_device_id": server_device_id}
+        return {}
 
     @property
     def unique_id(self) -> str:
