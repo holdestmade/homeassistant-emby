@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.2] - 2026-11-25
+
+### Fixed
+- **No more `via_device_id` deprecation warning on Home Assistant 2026.12**
+  - Home Assistant 2026.12 turned `DeviceInfo` into a dataclass and logs a
+    warning when an integration sets a field on it like a dictionary. Client
+    devices now pass their link to the Emby server device when the device info
+    is created, which works on both new and older Home Assistant versions
+
 ## [0.8.1] - 2026-11-24
 
 ### Changed
@@ -447,7 +456,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Browse cache with LRU + TTL for performance
 - Graceful degradation on partial failures
 
-[Unreleased]: https://github.com/holdestmade/homeassistant-emby/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/holdestmade/homeassistant-emby/compare/v0.8.2...HEAD
+[0.8.2]: https://github.com/holdestmade/homeassistant-emby/compare/v0.8.1...v0.8.2
+[0.8.1]: https://github.com/holdestmade/homeassistant-emby/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/holdestmade/homeassistant-emby/compare/v0.7.4...v0.8.0
 [0.7.4]: https://github.com/holdestmade/homeassistant-emby/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/holdestmade/homeassistant-emby/compare/v0.6.0...v0.7.3
